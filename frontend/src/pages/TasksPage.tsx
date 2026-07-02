@@ -29,6 +29,7 @@ import { listUsers } from '../api/users';
 import { useAuth } from '../auth/AuthContext';
 
 import { showAiNotice, showToast } from '../utils/toast';
+import { notifyTasksChanged } from '../utils/taskEvents';
 
 import { isRequestOnly } from '../constants/roles';
 
@@ -298,17 +299,18 @@ export function TasksPage() {
 
     }
 
-    const filters: Record<string, boolean> = {};
+    const filters: Record<string, boolean | string> = {};
 
     if (mode === 'group') {
 
       filters.my_group = true;
 
-      if (groupFilter === 'unassigned') filters.unassigned = true;
+      if (groupFilter === 'unassigned') filters.status = 'new';
 
     }
 
     listTasks(filters).then(setTasks).catch(() => {}).finally(() => setLoading(false));
+    notifyTasksChanged();
 
   };
 
@@ -453,6 +455,8 @@ export function TasksPage() {
       setShowCreate(false);
 
       load();
+
+      notifyTasksChanged();
 
     } catch (err) {
 

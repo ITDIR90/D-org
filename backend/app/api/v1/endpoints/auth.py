@@ -28,11 +28,15 @@ async def login(
     if not user.is_active:
         raise HTTPException(status_code=401, detail="Доступ закрыт")
     token = create_access_token({"sub": str(user.id)})
-    await log_user_action(
-        db, user.id, UserActionType.LOGIN,
-        ip_address=request.client.host if request.client else None,
-        user_agent=request.headers.get("user-agent"),
-    )
+    try:
+        await log_user_action(
+            db, user.id, UserActionType.LOGIN,
+            ip_address=request.client.host if request.client else None,
+            user_agent=request.headers.get("user-agent"),
+        )
+        await db.flush()
+    except Exception:
+        await db.rollback()
     return TokenResponse(access_token=token)
 
 

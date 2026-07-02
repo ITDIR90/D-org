@@ -22,7 +22,11 @@ export function LoginPage() {
     try {
       await login(nickname.trim(), password);
       saveLoginCredentials(nickname.trim(), password, remember);
-      await refresh();
+      const ok = await refresh();
+      if (!ok) {
+        setError('Не удалось загрузить профиль после входа. Проверьте VITE_API_URL и пересоберите frontend.');
+        return;
+      }
       navigate('/');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ошибка входа');

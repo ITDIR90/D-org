@@ -62,8 +62,8 @@ async def list_tasks_query(db: AsyncSession, user: User, **filters):
         q = q.where(Task.assignee_id == user.id)
     if filters.get("created_by_me"):
         q = q.where(Task.author_id == user.id)
-    if filters.get("unassigned"):
-        q = q.where(Task.assignee_id.is_(None), Task.status == TaskStatus.NEW)
+    if (filters.get("unassigned"):
+        q = q.where(Task.status == TaskStatus.NEW)
     if filters.get("overdue"):
         now = datetime.now(timezone.utc)
         q = q.where(

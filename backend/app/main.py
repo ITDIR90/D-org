@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from fastapi import Depends, FastAPI, Request
+from fastapi import Depends, FastAPI, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -54,6 +54,8 @@ async def moderation_error_handler(request: Request, exc: ModerationError):
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
+    if not isinstance(exc, HTTPException):
+        print(f"[error] {request.method} {request.url.path}: {exc!r}")
     return JSONResponse(status_code=500, content={"detail": "Внутренняя ошибка сервера"})
 
 
