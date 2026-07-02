@@ -144,6 +144,8 @@ function templateToForm(t: RequestTemplate): TaskCreateFormData {
 
     assignee_id: t.default_assignee_id ? String(t.default_assignee_id) : '',
 
+    notify_before_minutes: '60',
+
   };
 
 }

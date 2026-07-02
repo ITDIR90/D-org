@@ -70,11 +70,11 @@ export function markAllRead() {
 }
 
 export function listRecurring() {
-  return api('/api/v1/recurring-tasks');
+  return api<Record<string, unknown>[]>('/api/v1/recurring-tasks');
 }
 
 export function listUserActions() {
-  return api('/api/v1/logs/user-actions');
+  return api<Record<string, unknown>[]>('/api/v1/logs/user-actions');
 }
 
 export function clearUserActions() {
