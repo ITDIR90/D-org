@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { listTasks } from '../../api/tasks';
 import { useAuth } from '../../auth/AuthContext';
 import { isRequestOnly } from '../../constants/roles';
+import { TASKS_CHANGED_EVENT } from '../../utils/taskEvents';
 import {
   countActiveRequesterTasks,
   countAwaitingRequesterTasks,
@@ -73,7 +74,9 @@ export function TopbarKpis() {
     done: 0,
   });
 
-  useEffect(() => {
+  const refreshCounts = useCallback(() => {
+    if (!user) return;
+
     if (requester) {
       listTasks({ created_by_me: true })
         .then((tasks) => {
@@ -88,22 +91,40 @@ export function TopbarKpis() {
         .catch(() => {});
       return;
     }
-    Promise.all([
+
+    Promise.allSettled([
       listTasks({ my_tasks: true }),
-      listTasks({ my_group: true, unassigned: true }),
+      listTasks({ my_group: true, status: 'new' }),
       listTasks({ created_by_me: true }),
-    ])
-      .then(([myTasks, newTasks, createdTasks]) => {
-        setCounts({
-          inProgress: countInProgressTasks(myTasks),
-          urgent: countUrgentTasks(myTasks),
-          newTasks: newTasks.length,
-          awaiting: countAwaitingConfirmationTasks(myTasks, createdTasks),
-          done: 0,
-        });
-      })
-      .catch(() => {});
-  }, [location.pathname, requester]);
+    ]).then((results) => {
+      const myTasks = results[0].status === 'fulfilled' ? results[0].value : [];
+      const newTasks = results[1].status === 'fulfilled' ? results[1].value : [];
+      const createdTasks = results[2].status === 'fulfilled' ? results[2].value : [];
+
+      setCounts({
+        inProgress: countInProgressTasks(myTasks),
+        urgent: countUrgentTasks(myTasks),
+        newTasks: newTasks.length,
+        awaiting: countAwaitingConfirmationTasks(myTasks, createdTasks),
+        done: 0,
+      });
+    });
+  }, [requester, user]);
+
+  useEffect(() => {
+    refreshCounts();
+  }, [location.pathname, location.search, refreshCounts]);
+
+  useEffect(() => {
+    const onTasksChanged = () => refreshCounts();
+    const onFocus = () => refreshCounts();
+    window.addEventListener(TASKS_CHANGED_EVENT, onTasksChanged);
+    window.addEventListener('focus', onFocus);
+    return () => {
+      window.removeEventListener(TASKS_CHANGED_EVENT, onTasksChanged);
+      window.removeEventListener('focus', onFocus);
+    };
+  }, [refreshCounts]);
 
   const items: KpiItem[] = requester
     ? [

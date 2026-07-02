@@ -8,33 +8,35 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   logout: () => Promise<void>;
-  refresh: () => Promise<void>;
+  refresh: () => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
   logout: async () => {},
-  refresh: async () => {},
+  refresh: async () => false,
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const refresh = async () => {
+  const refresh = async (): Promise<boolean> => {
     if (!getToken()) {
       setUser(null);
       setLoading(false);
-      return;
+      return false;
     }
     try {
       const me = await getMe();
       setUser(me);
       applyUiTheme(normalizeUiTheme(me.ui_theme));
+      return true;
     } catch {
       clearToken();
       setUser(null);
+      return false;
     } finally {
       setLoading(false);
     }

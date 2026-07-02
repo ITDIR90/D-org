@@ -40,7 +40,7 @@ export function DashboardPage() {
     }
     Promise.all([
       listTasks({ my_tasks: true }),
-      listTasks({ my_group: true, unassigned: true }),
+      listTasks({ my_group: true, status: 'new' }),
       listTasks({ overdue: true }),
       listTasks({ created_by_me: true }),
       listNotifications(),

@@ -43,7 +43,8 @@ export interface ChangeLog {
 export function listTasks(params: Record<string, string | boolean> = {}) {
   const qs = new URLSearchParams();
   Object.entries(params).forEach(([k, v]) => {
-    if (v) qs.set(k, 'true');
+    if (v === true) qs.set(k, 'true');
+    else if (typeof v === 'string' && v) qs.set(k, v);
   });
   const q = qs.toString();
   return api<Task[]>(`/api/v1/tasks${q ? '?' + q : ''}`);
