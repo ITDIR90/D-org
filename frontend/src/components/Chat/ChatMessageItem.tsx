@@ -97,8 +97,8 @@ interface ChatPanelProps {
   footer: ReactNode;
   empty?: boolean;
   emptyText?: string;
-  messagesRef: React.RefObject<HTMLDivElement | null>;
-  scrollAnchor: React.RefObject<HTMLDivElement | null>;
+  messagesRef: React.Ref<HTMLDivElement>;
+  scrollAnchor: React.Ref<HTMLDivElement>;
   centered?: boolean;
 }
 

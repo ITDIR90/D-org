@@ -5,6 +5,7 @@ import { GroupMultiSelect } from '../Form/GroupMultiSelect';
 import { PasswordChangeFields } from '../Form/PasswordChangeFields';
 import { normalizeTimezone } from '../../constants/timezones';
 import { normalizeUiTheme, type UiTheme } from '../../constants/themes';
+import { applyUiTheme } from '../../theme/applyTheme';
 import { ThemeSelect } from '../Form/ThemeSelect';
 import { ROLE_LABELS, ROLES } from '../../constants/roles';
 

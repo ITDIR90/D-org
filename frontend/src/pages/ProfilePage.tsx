@@ -5,6 +5,7 @@ import { getNotificationChannels, testNotifications } from '../api/notifications
 import { listGroups } from '../api/groups';
 import { useAuth } from '../auth/AuthContext';
 import {
+  EMPTY_CREATE,
   EMPTY_PASSWORD,
   UserFormFields,
   userToForm,
@@ -14,7 +15,7 @@ import {
 export function ProfilePage() {
   const { user: me, refresh } = useAuth();
   const [groups, setGroups] = useState<{ id: number; name: string }[]>([]);
-  const [form, setForm] = useState<UserForm | null>(null);
+  const [form, setForm] = useState<UserForm>(EMPTY_CREATE);
   const [passwordForm, setPasswordForm] = useState(EMPTY_PASSWORD);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -64,7 +65,7 @@ export function ProfilePage() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!me || !form) return;
+    if (!me) return;
 
     const pwdError = validatePassword();
     if (pwdError) {
@@ -133,9 +134,9 @@ export function ProfilePage() {
   const setGroupField = (
     field: 'member_group_ids' | 'task_target_group_ids',
     ids: number[],
-  ) => setForm((prev) => (prev ? { ...prev, [field]: ids } : prev));
+  ) => setForm((prev) => ({ ...prev, [field]: ids }));
 
-  if (!me || !form) {
+  if (!me) {
     return null;
   }
 
