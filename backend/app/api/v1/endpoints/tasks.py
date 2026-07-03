@@ -13,7 +13,9 @@ from app.models.user import User
 from app.schemas.common import MessageResponse
 from app.schemas.logs import TaskChangeLogRead
 from app.schemas.task import CommentCreate, CommentRead, TaskCreate, TaskRead, TaskUpdate
-from app.services.ai_service import ModerationError, process_text
+from app.services.ai_service import ModerationError
+from app.services.duplicate_message_service import DuplicateMessageError
+from app.services.message_submission_service import process_user_message
 from app.services.audit_service import log_user_action
 from app.services.notification_service import create_notification
 from app.services.task_service import (
@@ -149,11 +151,13 @@ async def add_comment(
     if not await can_view_task(db, user, task):
         raise HTTPException(status_code=403, detail="Нет доступа")
     try:
-        ai_result = await process_text(
+        ai_result = await process_user_message(
             db, user.id, data.text,
             ip_address=request.client.host if request.client else None,
             user_agent=request.headers.get("user-agent"),
         )
+    except DuplicateMessageError as e:
+        raise HTTPException(status_code=429, detail=str(e))
     except ModerationError as e:
         raise HTTPException(status_code=400, detail=str(e))
     comment = Comment(

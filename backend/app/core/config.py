@@ -40,6 +40,8 @@ class Settings(BaseSettings):
     DEFAULT_SUPERADMIN_EMAIL: str = "admin@example.com"
     DEFAULT_SUPERADMIN_PASSWORD: str = "admin12345"
 
+    DUPLICATE_MESSAGE_WINDOW_SECONDS: int = 30
+
     @property
     def cors_origins(self) -> List[str]:
         return [o.strip() for o in self.BACKEND_CORS_ORIGINS.split(",") if o.strip()]

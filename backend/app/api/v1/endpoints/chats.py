@@ -10,7 +10,9 @@ from app.models.chat import DirectChatMessage, GroupChatMessage
 from app.models.user import User
 from app.schemas.chat import ChatContactRead, ChatMessageCreate, DirectChatMessageRead, DirectThreadRead, GroupChatMessageRead
 from app.schemas.common import MessageResponse
-from app.services.ai_service import ModerationError, process_text
+from app.services.ai_service import ModerationError
+from app.services.duplicate_message_service import DuplicateMessageError
+from app.services.message_submission_service import process_user_message
 from app.services.audit_service import log_user_action
 from app.services.user_service import list_chat_contacts
 
@@ -95,11 +97,13 @@ async def send_group_message(
     if not await can_view_group_chat(db, user, group_id):
         raise HTTPException(status_code=403, detail="Нет доступа")
     try:
-        ai_result = await process_text(
+        ai_result = await process_user_message(
             db, user.id, data.text,
             ip_address=request.client.host if request.client else None,
             user_agent=request.headers.get("user-agent"),
         )
+    except DuplicateMessageError as e:
+        raise HTTPException(status_code=429, detail=str(e))
     except ModerationError as e:
         raise HTTPException(status_code=400, detail=str(e))
     msg = GroupChatMessage(group_id=group_id, author_id=user.id, text=ai_result.text)
@@ -153,11 +157,13 @@ async def send_direct_message(
     if not await can_message_user(db, user, other_user_id):
         raise HTTPException(status_code=403, detail="Нет доступа к переписке с этим пользователем")
     try:
-        ai_result = await process_text(
+        ai_result = await process_user_message(
             db, user.id, data.text,
             ip_address=request.client.host if request.client else None,
             user_agent=request.headers.get("user-agent"),
         )
+    except DuplicateMessageError as e:
+        raise HTTPException(status_code=429, detail=str(e))
     except ModerationError as e:
         raise HTTPException(status_code=400, detail=str(e))
     msg = DirectChatMessage(sender_id=user.id, recipient_id=other_user_id, text=ai_result.text)
