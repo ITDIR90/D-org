@@ -4,6 +4,7 @@ from app.models.chat import DirectChatMessage, GroupChatMessage
 from app.models.comment import Comment
 from app.models.group import Group
 from app.models.logs import TaskChangeLog, UserActionLog
+from app.models.device_token import UserDeviceToken
 from app.models.notification import Notification
 from app.models.project import Project, ProjectSubtask
 from app.models.recurring_task import RecurringTaskTemplate
@@ -25,6 +26,7 @@ __all__ = [
     "RequestTemplate",
     "Comment",
     "Notification",
+    "UserDeviceToken",
     "GroupChatMessage",
     "DirectChatMessage",
     "TaskChangeLog",

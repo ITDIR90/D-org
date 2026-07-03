@@ -21,6 +21,7 @@ class User(Base):
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     notify_via_email: Mapped[bool] = mapped_column(Boolean, default=True)
     notify_via_telegram: Mapped[bool] = mapped_column(Boolean, default=False)
+    notify_via_push: Mapped[bool] = mapped_column(Boolean, default=True)
     telegram_chat_id: Mapped[str | None] = mapped_column(String(50))
     overdue_digest_sent_on: Mapped[date | None] = mapped_column(Date)
     role: Mapped[UserRole] = mapped_column(pg_enum(UserRole, "user_role"), default=UserRole.USER)

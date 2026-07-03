@@ -18,14 +18,17 @@ settings = get_settings()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    async with async_session() as db:
-        ai = await get_ai_status(db)
-    if ai["enabled"] and ai["ready"]:
-        print(f"AI: включён ({ai['provider']}, модель {ai['model']})")
-    elif ai["enabled"]:
-        print(f"AI: включён в настройках, но не готов — {ai['reason']}")
-    else:
-        print(f"AI: выключен — {ai['reason']}")
+    try:
+        async with async_session() as db:
+            ai = await get_ai_status(db)
+        if ai["enabled"] and ai["ready"]:
+            print(f"AI: включён ({ai['provider']}, модель {ai['model']})")
+        elif ai["enabled"]:
+            print(f"AI: включён в настройках, но не готов — {ai['reason']}")
+        else:
+            print(f"AI: выключен — {ai['reason']}")
+    except Exception as exc:
+        print(f"AI: не удалось проверить настройки при старте — {exc!r}")
     start_scheduler()
     yield
     stop_scheduler()
@@ -57,6 +60,11 @@ async def global_exception_handler(request: Request, exc: Exception):
     if not isinstance(exc, HTTPException):
         print(f"[error] {request.method} {request.url.path}: {exc!r}")
     return JSONResponse(status_code=500, content={"detail": "Внутренняя ошибка сервера"})
+
+
+@app.get("/health/live")
+async def health_live():
+    return {"status": "ok"}
 
 
 @app.get("/health")

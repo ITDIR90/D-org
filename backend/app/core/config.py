@@ -34,6 +34,9 @@ class Settings(BaseSettings):
     TELEGRAM_BOT_TOKEN: str = ""
     TELEGRAM_ENABLED: bool = False
 
+    PUSH_ENABLED: bool = True
+    EXPO_ACCESS_TOKEN: str = ""
+
     DEFAULT_SUPERADMIN_EMAIL: str = "admin@example.com"
     DEFAULT_SUPERADMIN_PASSWORD: str = "admin12345"
 

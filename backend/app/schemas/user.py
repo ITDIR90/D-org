@@ -19,6 +19,7 @@ class UserBase(BaseModel):
     email: EmailStr
     notify_via_email: bool = True
     notify_via_telegram: bool = False
+    notify_via_push: bool = True
     telegram_chat_id: str | None = None
     role: UserRole = UserRole.USER
 
@@ -39,6 +40,7 @@ class UserUpdate(BaseModel):
     email: EmailStr | None = None
     notify_via_email: bool | None = None
     notify_via_telegram: bool | None = None
+    notify_via_push: bool | None = None
     telegram_chat_id: str | None = None
     role: UserRole | None = None
     member_group_ids: list[int] | None = None
