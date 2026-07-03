@@ -15,7 +15,9 @@ from app.models.user import User
 from app.schemas.common import MessageResponse
 from app.schemas.project import ProjectCreate, ProjectRead, ProjectUpdate, SubtaskCreate, SubtaskRead, SubtaskUpdate
 from app.schemas.task import CommentCreate, CommentRead
-from app.services.ai_service import ModerationError, process_fields, process_text
+from app.services.ai_service import ModerationError, process_fields
+from app.services.duplicate_message_service import DuplicateMessageError
+from app.services.message_submission_service import process_user_message
 from app.services.audit_service import log_field_changes, log_task_change, log_user_action
 from app.services.notification_service import create_notification
 
@@ -152,11 +154,13 @@ async def project_comment(
     if not project:
         raise HTTPException(status_code=404, detail="Проект не найден")
     try:
-        ai_result = await process_text(
+        ai_result = await process_user_message(
             db, user.id, data.text,
             ip_address=request.client.host if request.client else None,
             user_agent=request.headers.get("user-agent"),
         )
+    except DuplicateMessageError as e:
+        raise HTTPException(status_code=429, detail=str(e))
     except ModerationError as e:
         raise HTTPException(status_code=400, detail=str(e))
     db.add(Comment(entity_type=EntityType.PROJECT, entity_id=project_id, author_id=user.id, text=ai_result.text))
@@ -295,11 +299,13 @@ async def subtask_comment(
     if not subtask:
         raise HTTPException(status_code=404, detail="Подзадача не найдена")
     try:
-        ai_result = await process_text(
+        ai_result = await process_user_message(
             db, user.id, data.text,
             ip_address=request.client.host if request.client else None,
             user_agent=request.headers.get("user-agent"),
         )
+    except DuplicateMessageError as e:
+        raise HTTPException(status_code=429, detail=str(e))
     except ModerationError as e:
         raise HTTPException(status_code=400, detail=str(e))
     db.add(Comment(entity_type=EntityType.PROJECT_SUBTASK, entity_id=subtask_id, author_id=user.id, text=ai_result.text))
