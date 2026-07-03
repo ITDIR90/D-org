@@ -30,5 +30,11 @@ async def create_notification(
 
     target = recipient or send_email_to
     if target:
-        await deliver_notification(db, target, title, message)
+        push_data = {
+            "notificationId": str(notification.id),
+            "type": ntype.value,
+            "entityType": entity_type.value if entity_type else "",
+            "entityId": str(entity_id) if entity_id is not None else "",
+        }
+        await deliver_notification(db, target, title, message, push_data=push_data)
     return notification

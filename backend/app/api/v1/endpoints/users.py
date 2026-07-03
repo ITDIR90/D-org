@@ -71,7 +71,7 @@ async def update_user(
         raise HTTPException(status_code=403, detail="Нельзя назначить роль супер-администратора")
     update = data.model_dump(exclude_unset=True)
     if actor.id != user_id:
-        for key in ("notify_via_email", "notify_via_telegram", "telegram_chat_id"):
+        for key in ("notify_via_email", "notify_via_telegram", "notify_via_push", "telegram_chat_id"):
             update.pop(key, None)
     for key in ("member_group_ids", "task_target_group_ids"):
         update.pop(key, None)

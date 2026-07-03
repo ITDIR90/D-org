@@ -5,18 +5,25 @@ fi
 
 set -e
 
+echo "[backend] Database target:"
+python -c "from app.core.config import get_settings; print(get_settings().DATABASE_URL.split('@')[-1])" || true
+
 echo "[backend] Waiting for database..."
-for i in $(seq 1 30); do
+ready=0
+i=1
+while [ "$i" -le 45 ]; do
   if python -m app.db.wait_for_db; then
     echo "[backend] Database is ready"
+    ready=1
     break
   fi
-  if [ "$i" -eq 30 ]; then
-    echo "[backend] ERROR: database is not reachable after 60s"
-    exit 1
-  fi
+  i=$((i + 1))
   sleep 2
 done
+if [ "$ready" -ne 1 ]; then
+  echo "[backend] ERROR: database is not reachable after 90s"
+  exit 1
+fi
 
 echo "[backend] Applying migrations..."
 alembic upgrade head
