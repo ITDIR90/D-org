@@ -22,6 +22,7 @@ export interface User {
   notify_via_email?: boolean;
   notify_via_telegram?: boolean;
   telegram_chat_id?: string | null;
+  printer?: string | null;
 }
 
 export interface SavedLogin {

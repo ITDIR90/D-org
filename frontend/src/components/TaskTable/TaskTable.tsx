@@ -16,6 +16,7 @@ const STATUS_ORDER: Record<string, number> = {
 };
 
 const TASK_SORT_ACCESSORS = {
+  number: (t: Task) => t.number ?? 0,
   title: (t: Task) => t.title,
   status: (t: Task) => STATUS_ORDER[t.status] ?? 99,
   priority: (t: Task) => PRIORITY_ORDER[t.priority] ?? 99,
@@ -49,6 +50,7 @@ export function TaskTable({ tasks }: { tasks: Task[] }) {
       <table className="data-table">
         <thead>
           <tr>
+            <SortableTh label="№" sortKey="number" activeKey={sortKey} direction={direction} onSort={toggleSort} />
             <SortableTh label="Название" sortKey="title" activeKey={sortKey} direction={direction} onSort={toggleSort} />
             <SortableTh label="Статус" sortKey="status" activeKey={sortKey} direction={direction} onSort={toggleSort} />
             <SortableTh label="Важность" sortKey="priority" activeKey={sortKey} direction={direction} onSort={toggleSort} />
@@ -62,6 +64,7 @@ export function TaskTable({ tasks }: { tasks: Task[] }) {
         <tbody>
           {sorted.map((t) => (
             <tr key={t.id} className={t.is_overdue ? 'row-overdue' : ''}>
+              <td className="task-number-cell">{t.number}</td>
               <td>
                 <Link to={`/tasks/${t.id}`} className="link">{t.title}</Link>
                 {t.is_overdue && <span className="overdue-tag">Просрочена</span>}

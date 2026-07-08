@@ -71,6 +71,7 @@ async def create_user_record(db: AsyncSession, data: UserCreate) -> User:
         notify_via_email=data.notify_via_email,
         notify_via_telegram=data.notify_via_telegram,
         telegram_chat_id=data.telegram_chat_id,
+        printer=data.printer,
         password_hash=get_password_hash(data.password),
         role=data.role,
     )

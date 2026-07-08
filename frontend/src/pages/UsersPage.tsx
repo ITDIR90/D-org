@@ -185,6 +185,7 @@ export function UsersPage() {
         email: form.email,
         timezone: form.timezone,
         ui_theme: form.ui_theme,
+        printer: selfOnly ? undefined : form.printer,
         role: selfOnly ? undefined : form.role,
         member_group_ids: selfOnly ? undefined : form.member_group_ids,
         task_target_group_ids: selfOnly ? undefined : form.task_target_group_ids,
@@ -232,6 +233,7 @@ export function UsersPage() {
             <tr>
               <SortableTh label="ФИО" sortKey="full_name" activeKey={sortKey} direction={direction} onSort={toggleSort} />
               <SortableTh label="Email" sortKey="email" activeKey={sortKey} direction={direction} onSort={toggleSort} />
+              <th>Принтер</th>
               <SortableTh label="Роль" sortKey="role" activeKey={sortKey} direction={direction} onSort={toggleSort} />
               <SortableTh label="Активен" sortKey="is_active" activeKey={sortKey} direction={direction} onSort={toggleSort} />
               <th>Действия</th>
@@ -245,6 +247,7 @@ export function UsersPage() {
                   <span className="user-cell-nick">@{u.nickname}</span>
                 </td>
                 <td>{u.email}</td>
+                <td>{u.printer || '—'}</td>
                 <td><span className={`role-badge role-badge--${u.role}`}>{ROLE_LABELS[u.role] || u.role}</span></td>
                 <td>
                   <span className={`status-dot ${u.is_active ? 'status-dot--active' : 'status-dot--inactive'}`}>

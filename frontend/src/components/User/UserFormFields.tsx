@@ -24,6 +24,7 @@ export const EMPTY_CREATE = {
   notify_via_email: true,
   notify_via_telegram: false,
   telegram_chat_id: '',
+  printer: '',
 };
 
 export type UserForm = typeof EMPTY_CREATE;
@@ -53,6 +54,7 @@ export function userToForm(u: User): UserForm {
     notify_via_email: u.notify_via_email ?? true,
     notify_via_telegram: u.notify_via_telegram ?? false,
     telegram_chat_id: u.telegram_chat_id || '',
+    printer: u.printer || '',
   };
 }
 
@@ -201,6 +203,17 @@ export function UserFormFields({
               </p>
             </div>
           )}
+        </div>
+      )}
+      {canManage && !selfOnly && (
+        <div className="form-group">
+          <label>Принтер</label>
+          <input
+            value={form.printer}
+            onChange={(e) => setForm({ ...form, printer: e.target.value })}
+            placeholder="Например: HP LaserJet M15w (каб. 204)"
+          />
+          <p className="form-hint">Заполняется администратором</p>
         </div>
       )}
       {canManage && !selfOnly && (

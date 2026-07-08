@@ -23,6 +23,7 @@ class User(Base):
     notify_via_telegram: Mapped[bool] = mapped_column(Boolean, default=False)
     notify_via_push: Mapped[bool] = mapped_column(Boolean, default=True)
     telegram_chat_id: Mapped[str | None] = mapped_column(String(50))
+    printer: Mapped[str | None] = mapped_column(String(255))
     overdue_digest_sent_on: Mapped[date | None] = mapped_column(Date)
     role: Mapped[UserRole] = mapped_column(pg_enum(UserRole, "user_role"), default=UserRole.USER)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)

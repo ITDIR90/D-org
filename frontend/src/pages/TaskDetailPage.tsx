@@ -179,7 +179,7 @@ export function TaskDetailPage() {
   return (
     <div>
       <div className="page-header">
-        <h1>{task.title}</h1>
+        <h1><span className="task-number-badge">№{task.number}</span> {task.title}</h1>
         <div className="actions">
           {canTake && (
             <button
@@ -236,6 +236,7 @@ export function TaskDetailPage() {
 
       <div className="card">
         <div className="detail-grid">
+          <div className="detail-item"><label>Номер</label><span>№{task.number}</span></div>
           <div className="detail-item"><label>Статус</label><span><StatusBadge status={task.status} /></span></div>
           <div className="detail-item"><label>Важность</label><span><PriorityBadge priority={task.priority} /></span></div>
           <div className="detail-item"><label>Автор</label><span>{task.author_name}</span></div>
