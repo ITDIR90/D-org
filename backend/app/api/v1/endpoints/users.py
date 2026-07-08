@@ -73,6 +73,9 @@ async def update_user(
     if actor.id != user_id:
         for key in ("notify_via_email", "notify_via_telegram", "notify_via_push", "telegram_chat_id"):
             update.pop(key, None)
+    can_manage = actor.role == UserRole.SUPERADMIN or await can_manage_users(db, actor)
+    if not can_manage:
+        update.pop("printer", None)
     for key in ("member_group_ids", "task_target_group_ids"):
         update.pop(key, None)
     for key, value in update.items():

@@ -21,6 +21,7 @@ class UserBase(BaseModel):
     notify_via_telegram: bool = False
     notify_via_push: bool = True
     telegram_chat_id: str | None = None
+    printer: str | None = None
     role: UserRole = UserRole.USER
 
 
@@ -42,6 +43,7 @@ class UserUpdate(BaseModel):
     notify_via_telegram: bool | None = None
     notify_via_push: bool | None = None
     telegram_chat_id: str | None = None
+    printer: str | None = None
     role: UserRole | None = None
     member_group_ids: list[int] | None = None
     task_target_group_ids: list[int] | None = None

@@ -32,7 +32,9 @@ export function TaskCompactList({ tasks, showAssignee, showAuthor }: TaskCompact
       {tasks.map((t) => (
         <li key={t.id} className={`task-compact-item ${t.is_overdue ? 'task-compact-item--overdue' : ''}`}>
           <div className="task-compact-main">
-            <Link to={`/tasks/${t.id}`} className="task-compact-title">{t.title}</Link>
+            <Link to={`/tasks/${t.id}`} className="task-compact-title">
+              <span className="task-compact-number">№{t.number}</span> {t.title}
+            </Link>
             <div className="task-compact-badges">
               <StatusBadge status={t.status} />
               <PriorityBadge priority={t.priority} />

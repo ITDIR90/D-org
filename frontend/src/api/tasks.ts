@@ -2,6 +2,7 @@ import { api } from './client';
 
 export interface Task {
   id: number;
+  number: number;
   title: string;
   description?: string;
   author_id: number;
