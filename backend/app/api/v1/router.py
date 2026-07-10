@@ -5,6 +5,7 @@ from app.api.v1.endpoints import (
     categories,
     chats,
     groups,
+    integrations,
     logs,
     notifications,
     projects,
@@ -21,6 +22,7 @@ api_router.include_router(users.router)
 api_router.include_router(groups.router)
 api_router.include_router(categories.router)
 api_router.include_router(tasks.router)
+api_router.include_router(integrations.router)
 api_router.include_router(projects.router)
 api_router.include_router(recurring_tasks.router)
 api_router.include_router(request_templates.router)

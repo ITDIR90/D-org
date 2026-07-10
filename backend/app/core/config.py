@@ -42,6 +42,10 @@ class Settings(BaseSettings):
 
     DUPLICATE_MESSAGE_WINDOW_SECONDS: int = 30
 
+    INTEGRATION_API_ENABLED: bool = False
+    INTEGRATION_API_KEY: str = ""
+    INTEGRATION_USER_ID: int = 0
+
     @property
     def cors_origins(self) -> List[str]:
         return [o.strip() for o in self.BACKEND_CORS_ORIGINS.split(",") if o.strip()]
