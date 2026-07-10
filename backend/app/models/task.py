@@ -38,6 +38,11 @@ class Task(Base):
     source_recurring_template_id: Mapped[int | None] = mapped_column(
         ForeignKey("recurring_task_templates.id")
     )
+    external_source: Mapped[str | None] = mapped_column(String(50))
+    external_id: Mapped[str | None] = mapped_column(String(200))
+    source_request_template_id: Mapped[int | None] = mapped_column(
+        ForeignKey("request_templates.id")
+    )
     cancelled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     cancelled_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
