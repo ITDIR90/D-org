@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select, update
+from sqlalchemy.exc import ProgrammingError, OperationalError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user
@@ -30,7 +31,13 @@ async def register_push_token(
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    await register_device_token(db, user.id, data.token, data.platform)
+    try:
+        await register_device_token(db, user.id, data.token, data.platform)
+    except (ProgrammingError, OperationalError) as exc:
+        raise HTTPException(
+            status_code=503,
+            detail="Push не настроен на сервере: выполните миграции (alembic upgrade head)",
+        ) from exc
     return {"message": "Токен зарегистрирован"}
 
 
