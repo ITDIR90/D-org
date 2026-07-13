@@ -95,6 +95,10 @@ async def send_push_to_user(
             "sound": "default",
             "priority": "high",
             "channelId": "default",
+            "android": {
+                "channelId": "default",
+                "priority": "high",
+            },
         }
         for token in tokens
     ]
