@@ -63,6 +63,8 @@ const TITLES: Record<string, string> = {
 
   new: 'Новая задача',
 
+  archive: 'Архив задач',
+
 };
 
 
@@ -309,6 +311,12 @@ export function TasksPage() {
 
     }
 
+    if (mode === 'archive') {
+
+      filters.archived = true;
+
+    }
+
     listTasks(filters).then(setTasks).catch(() => {}).finally(() => setLoading(false));
     notifyTasksChanged();
 
@@ -534,6 +542,12 @@ export function TasksPage() {
 
   }
 
+  if (mode === 'archive' && !isAdmin) {
+
+    return <Navigate to="/tasks/my" replace />;
+
+  }
+
 
 
   if (mode === 'new' || showCreate) {
@@ -566,7 +580,7 @@ export function TasksPage() {
 
         <h1>{titles[mode] || (requester ? 'Заявки' : 'Задачи')}</h1>
 
-        {mode === 'my' || mode === 'group' ? (
+        {mode !== 'archive' && (mode === 'my' || mode === 'group' ? (
 
           <Link to="/tasks/new" className="btn btn-primary">{createLabel}</Link>
 
@@ -574,7 +588,7 @@ export function TasksPage() {
 
           <button className="btn btn-primary" onClick={() => setShowCreate(true)}>{createLabel}</button>
 
-        )}
+        ))}
 
       </div>
 
@@ -668,7 +682,7 @@ export function TasksPage() {
 
       ) : displayedTasks.length === 0 ? (
 
-        <p className="empty">{emptyLabel}</p>
+        <p className="empty">{mode === 'archive' ? 'В архиве пока нет задач' : emptyLabel}</p>
 
       ) : (
 

@@ -19,6 +19,7 @@ from app.services.message_submission_service import process_user_message
 from app.services.audit_service import log_user_action
 from app.services.notification_service import create_notification
 from app.services.task_service import (
+    archive_task,
     cancel_task,
     complete_task,
     confirm_task,
@@ -26,6 +27,7 @@ from app.services.task_service import (
     enrich_task,
     get_task_or_404,
     list_tasks_query,
+    sort_tasks_for_infopanel,
     take_task,
     task_to_read,
     update_task,
@@ -42,6 +44,7 @@ async def list_tasks(
     unassigned: bool = False,
     overdue: bool = False,
     awaiting_confirmation: bool = False,
+    archived: bool = False,
     group_id: int | None = None,
     status: TaskStatus | None = None,
     user: User = Depends(get_current_user),
@@ -50,10 +53,20 @@ async def list_tasks(
     tasks = await list_tasks_query(
         db, user,
         my_tasks=my_tasks, created_by_me=created_by_me, my_group=my_group, unassigned=unassigned,
-        overdue=overdue, awaiting_confirmation=awaiting_confirmation,
+        overdue=overdue, awaiting_confirmation=awaiting_confirmation, archived=archived,
         group_id=group_id, status=status,
     )
     return [enrich_task(t) for t in tasks]
+
+
+@router.get("/infopanel", response_model=list[TaskRead])
+async def infopanel_tasks(
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    tasks = await list_tasks_query(db, user, active_only=True)
+    sorted_tasks = sort_tasks_for_infopanel(tasks)
+    return [enrich_task(t) for t in sorted_tasks]
 
 
 @router.get("/{task_id}", response_model=TaskRead)
@@ -136,6 +149,13 @@ async def confirm(task_id: int, user: User = Depends(get_current_user), db: Asyn
 async def cancel(task_id: int, user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     task = await get_task_or_404(db, task_id)
     await cancel_task(db, user, task)
+    return await task_to_read(db, task_id)
+
+
+@router.post("/{task_id}/archive", response_model=TaskRead)
+async def archive(task_id: int, user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    task = await get_task_or_404(db, task_id)
+    await archive_task(db, user, task)
     return await task_to_read(db, task_id)
 
 

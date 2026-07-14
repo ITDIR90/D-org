@@ -14,7 +14,7 @@ export const MY_TASK_FILTERS: { id: MyTaskFilter; label: string }[] = [
 ];
 
 export function isActiveTask(task: Task) {
-  return !['done', 'cancelled'].includes(task.status);
+  return !['done', 'cancelled', 'archived'].includes(task.status);
 }
 
 export function isInProgressTask(task: Task) {

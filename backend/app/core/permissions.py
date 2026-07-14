@@ -68,6 +68,18 @@ async def is_group_admin(db: AsyncSession, user: User, group_id: int) -> bool:
     return group_id in admin_ids
 
 
+def is_admin_user(user: User) -> bool:
+    return user.role in (UserRole.SUPERADMIN, UserRole.GROUP_ADMIN)
+
+
+async def can_archive_task(db: AsyncSession, user: User, task) -> bool:
+    if user.role == UserRole.SUPERADMIN:
+        return True
+    if user.role == UserRole.GROUP_ADMIN:
+        return await is_group_admin(db, user, task.target_group_id)
+    return False
+
+
 async def can_manage_group(db: AsyncSession, user: User, group_id: int) -> bool:
     return await is_group_admin(db, user, group_id)
 

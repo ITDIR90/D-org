@@ -50,7 +50,7 @@ export function DashboardPage() {
           [...my, ...created].filter((t) => t.status === 'waiting_author_confirmation'),
         );
         const activeMy = my.filter(
-          (t) => !['done', 'cancelled', 'waiting_author_confirmation'].includes(t.status),
+          (t) => !['done', 'cancelled', 'archived', 'waiting_author_confirmation'].includes(t.status),
         );
 
         setMyTasks(activeMy);

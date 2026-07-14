@@ -8,6 +8,7 @@ import { isRequestOnly } from '../../constants/roles';
 
 const NAV = [
   { path: '/', label: 'Дашборд', icon: '◉' },
+  { path: '/infopanel', label: 'Инфопанель', icon: '📺' },
   { path: '/tasks/my', label: 'Мои задачи', icon: '☑' },
   { path: '/tasks/group', label: 'Задачи группы', icon: '▣' },
   { path: '/projects', label: 'Проекты', icon: '▤' },
