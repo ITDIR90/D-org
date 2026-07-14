@@ -413,3 +413,27 @@ def sort_tasks_for_infopanel(tasks: list[Task]) -> list[Task]:
         )
 
     return sorted(tasks, key=sort_key)
+
+
+INFOPANEL_GROUP_ID = 1
+
+
+async def list_infopanel_tasks(db: AsyncSession, group_id: int = INFOPANEL_GROUP_ID) -> list[Task]:
+    result = await db.execute(
+        select(Task)
+        .options(
+            selectinload(Task.author),
+            selectinload(Task.assignee),
+            selectinload(Task.category),
+        )
+        .where(
+            Task.target_group_id == group_id,
+            Task.status.notin_([
+                TaskStatus.DONE,
+                TaskStatus.CANCELLED,
+                TaskStatus.ARCHIVED,
+            ]),
+        )
+        .order_by(Task.created_at.desc())
+    )
+    return list(result.scalars().all())

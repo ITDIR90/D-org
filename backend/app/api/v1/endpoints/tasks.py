@@ -26,6 +26,7 @@ from app.services.task_service import (
     create_task,
     enrich_task,
     get_task_or_404,
+    list_infopanel_tasks,
     list_tasks_query,
     sort_tasks_for_infopanel,
     take_task,
@@ -60,11 +61,8 @@ async def list_tasks(
 
 
 @router.get("/infopanel", response_model=list[TaskRead])
-async def infopanel_tasks(
-    user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
-):
-    tasks = await list_tasks_query(db, user, active_only=True)
+async def infopanel_tasks(db: AsyncSession = Depends(get_db)):
+    tasks = await list_infopanel_tasks(db)
     sorted_tasks = sort_tasks_for_infopanel(tasks)
     return [enrich_task(t) for t in sorted_tasks]
 

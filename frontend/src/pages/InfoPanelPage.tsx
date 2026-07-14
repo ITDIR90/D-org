@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { listInfopanelTasks, type Task } from '../api/tasks';
 import { StatusBadge } from '../components/StatusBadge/StatusBadge';
 import { PriorityBadge } from '../components/PriorityBadge/PriorityBadge';
@@ -115,7 +114,7 @@ export function InfoPanelPage() {
           <LogoMark size={40} variant="light" />
           <div>
             <LogoText variant="short" />
-            <p className="infopanel-subtitle">Центр управления задачами</p>
+            <p className="infopanel-subtitle">Задачи группы ИТ</p>
           </div>
         </div>
         <div className="infopanel-clock">{formatClock(now)}</div>
@@ -123,9 +122,6 @@ export function InfoPanelPage() {
           <button type="button" className="btn btn-secondary btn-sm" onClick={() => load()}>
             Обновить
           </button>
-          <Link to="/" className="btn btn-ghost btn-sm infopanel-back-link">
-            В систему
-          </Link>
         </div>
       </header>
 

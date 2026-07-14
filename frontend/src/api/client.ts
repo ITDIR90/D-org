@@ -59,7 +59,8 @@ function parseErrorDetail(detail: unknown): string {
 
 export async function api<T>(
   path: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
+  requireAuth = true,
 ): Promise<T> {
   const token = getToken();
   const headers: Record<string, string> = {
@@ -78,13 +79,17 @@ export async function api<T>(
   }
 
   if (res.status === 401) {
-    clearToken();
-    const err = await res.json().catch(() => ({ detail: 'Требуется авторизация' }));
-    const message = parseErrorDetail(err.detail);
-    if (!window.location.pathname.startsWith('/login')) {
-      window.location.href = '/login';
+    if (requireAuth) {
+      clearToken();
+      const err = await res.json().catch(() => ({ detail: 'Требуется авторизация' }));
+      const message = parseErrorDetail(err.detail);
+      if (!window.location.pathname.startsWith('/login')) {
+        window.location.href = '/login';
+      }
+      throw new Error(message);
     }
-    throw new Error(message);
+    const err = await res.json().catch(() => ({ detail: 'Требуется авторизация' }));
+    throw new Error(parseErrorDetail(err.detail));
   }
 
   if (!res.ok) {

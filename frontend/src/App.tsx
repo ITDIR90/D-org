@@ -27,7 +27,7 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/infopanel" element={<ProtectedRoute><InfoPanelPage /></ProtectedRoute>} />
+          <Route path="/infopanel" element={<InfoPanelPage />} />
           <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
             <Route path="/" element={<DashboardPage />} />
             <Route path="/tasks/my" element={<TasksPage />} />

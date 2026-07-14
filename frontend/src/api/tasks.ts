@@ -89,5 +89,5 @@ export function getHistory(taskId: number) {
 }
 
 export function listInfopanelTasks() {
-  return api<Task[]>('/api/v1/tasks/infopanel');
+  return api<Task[]>('/api/v1/tasks/infopanel', {}, false);
 }
