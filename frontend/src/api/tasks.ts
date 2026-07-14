@@ -87,3 +87,7 @@ export function addComment(taskId: number, text: string) {
 export function getHistory(taskId: number) {
   return api<ChangeLog[]>(`/api/v1/tasks/${taskId}/history`);
 }
+
+export function listInfopanelTasks() {
+  return api<Task[]>('/api/v1/tasks/infopanel');
+}

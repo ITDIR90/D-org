@@ -5,12 +5,15 @@ from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.core.enums import EntityType, NotificationType, TaskStatus, UserActionType, UserRole
+from app.core.enums import EntityType, NotificationType, TaskPriority, TaskStatus, UserActionType, UserRole
 from app.core.permissions import (
+    can_archive_task,
     can_create_task_in_group,
     can_view_task,
     get_accessible_group_ids,
+    get_user_admin_group_ids,
     get_user_member_group_ids,
+    is_admin_user,
     is_group_admin,
     is_request_only,
 )
@@ -27,7 +30,7 @@ from app.services.notification_service import create_notification
 def enrich_task(task: Task) -> TaskRead:
     now = datetime.now(timezone.utc)
     is_overdue = (
-        task.status not in (TaskStatus.DONE, TaskStatus.CANCELLED)
+        task.status not in (TaskStatus.DONE, TaskStatus.CANCELLED, TaskStatus.ARCHIVED)
         and task.due_at.replace(tzinfo=timezone.utc) < now
     )
     data = TaskRead.model_validate(task)
@@ -68,7 +71,7 @@ async def list_tasks_query(db: AsyncSession, user: User, **filters):
         now = datetime.now(timezone.utc)
         q = q.where(
             Task.due_at < now,
-            Task.status.notin_([TaskStatus.DONE, TaskStatus.CANCELLED]),
+            Task.status.notin_([TaskStatus.DONE, TaskStatus.CANCELLED, TaskStatus.ARCHIVED]),
         )
     if filters.get("awaiting_confirmation"):
         q = q.where(Task.status == TaskStatus.WAITING_AUTHOR_CONFIRMATION, Task.author_id == user.id)
@@ -78,8 +81,28 @@ async def list_tasks_query(db: AsyncSession, user: User, **filters):
         accessible = await get_accessible_group_ids(db, user)
         if accessible:
             q = q.where(Task.target_group_id.in_(accessible))
-    if filters.get("status"):
+    if filters.get("archived"):
+        if not is_admin_user(user):
+            raise HTTPException(status_code=403, detail="Архив доступен только администраторам")
+        q = q.where(Task.status == TaskStatus.ARCHIVED)
+        if user.role == UserRole.GROUP_ADMIN:
+            admin_groups = await get_user_admin_group_ids(db, user)
+            if admin_groups:
+                q = q.where(Task.target_group_id.in_(admin_groups))
+            else:
+                q = q.where(Task.id == -1)
+    elif filters.get("status"):
         q = q.where(Task.status == filters["status"])
+    else:
+        q = q.where(Task.status != TaskStatus.ARCHIVED)
+    if filters.get("active_only"):
+        q = q.where(
+            Task.status.notin_([
+                TaskStatus.DONE,
+                TaskStatus.CANCELLED,
+                TaskStatus.ARCHIVED,
+            ])
+        )
     result = await db.execute(q.order_by(Task.created_at.desc()))
     return result.scalars().all()
 
@@ -235,6 +258,10 @@ async def update_task(
     old_status = task.status
     old_notify_before = task.notify_before_minutes
 
+    if "status" in update_data and update_data["status"] == TaskStatus.ARCHIVED:
+        if not await can_archive_task(db, user, task):
+            raise HTTPException(status_code=403, detail="Нет прав отправить задачу в архив")
+
     tracked = ["due_at", "assignee_id", "priority", "status", "spent_hours", "notify_before_minutes"]
     await log_field_changes(db, EntityType.TASK, task.id, task, update_data, tracked, user.id)
 
@@ -355,3 +382,34 @@ async def cancel_task(db: AsyncSession, user: User, task: Task) -> Task:
     await log_task_change(db, EntityType.TASK, task.id, "status", old_status, TaskStatus.CANCELLED, user.id)
     await db.flush()
     return task
+
+
+async def archive_task(db: AsyncSession, user: User, task: Task) -> Task:
+    if not await can_archive_task(db, user, task):
+        raise HTTPException(status_code=403, detail="Нет прав отправить задачу в архив")
+    if task.status == TaskStatus.ARCHIVED:
+        raise HTTPException(status_code=400, detail="Задача уже в архиве")
+    old_status = task.status
+    task.status = TaskStatus.ARCHIVED
+    await log_task_change(db, EntityType.TASK, task.id, "status", old_status, TaskStatus.ARCHIVED, user.id)
+    await db.flush()
+    return task
+
+
+def sort_tasks_for_infopanel(tasks: list[Task]) -> list[Task]:
+    priority_rank = {
+        TaskPriority.FERRARI: 0,
+        TaskPriority.HIGH: 1,
+        TaskPriority.MEDIUM: 2,
+    }
+
+    def sort_key(task: Task):
+        overdue = enrich_task(task).is_overdue
+        return (
+            0 if overdue else 1,
+            priority_rank.get(task.priority, 9),
+            task.due_at,
+            -task.id,
+        )
+
+    return sorted(tasks, key=sort_key)

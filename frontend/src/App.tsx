@@ -19,6 +19,7 @@ import { DirectChatPage } from './pages/DirectChatPage';
 import { LogsPage } from './pages/LogsPage';
 import { SystemSettingsPage } from './pages/SystemSettingsPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { InfoPanelPage } from './pages/InfoPanelPage';
 
 export default function App() {
   return (
@@ -26,11 +27,13 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/infopanel" element={<ProtectedRoute><InfoPanelPage /></ProtectedRoute>} />
           <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
             <Route path="/" element={<DashboardPage />} />
             <Route path="/tasks/my" element={<TasksPage />} />
             <Route path="/tasks/group" element={<TasksPage />} />
             <Route path="/tasks/new" element={<TasksPage />} />
+            <Route path="/tasks/archive" element={<TasksPage />} />
             <Route path="/tasks/templates" element={<RequestTemplatesPage />} />
             <Route path="/tasks/:id" element={<TaskDetailPage />} />
             <Route path="/projects" element={<ProjectsPage />} />

@@ -20,6 +20,7 @@ export function TasksSectionNav() {
 
   if (isAdmin) {
     links.push({ path: '/tasks/templates', label: 'Шаблоны заявок' });
+    links.push({ path: '/tasks/archive', label: 'Архив' });
   }
 
   const isActive = (path: string) =>

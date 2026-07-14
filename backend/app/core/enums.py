@@ -39,6 +39,7 @@ class TaskStatus(str, enum.Enum):
     WAITING_AUTHOR_CONFIRMATION = "waiting_author_confirmation"
     CANCELLED = "cancelled"
     DONE = "done"
+    ARCHIVED = "archived"
 
 
 class ProjectStatus(str, enum.Enum):

@@ -59,7 +59,8 @@ export function TaskDetailPage() {
   const isAdmin = isSuperadmin
     || (user?.role === 'group_admin' && (user?.admin_group_ids?.includes(task.target_group_id) ?? false));
   const isMember = isSuperadmin || (user?.member_group_ids?.includes(task.target_group_id) ?? false);
-  const isActive = !['done', 'cancelled'].includes(task.status);
+  const isActive = !['done', 'cancelled', 'archived'].includes(task.status);
+  const canArchive = isAdmin && task.status !== 'archived';
 
   const groupMembers = users.filter((u) => u.member_group_ids?.includes(task.target_group_id));
   const userNames = buildUserNameMap(users);
@@ -226,6 +227,19 @@ export function TaskDetailPage() {
               }}
             >
               {actionLoading === 'cancel' ? '...' : 'Отменить'}
+            </button>
+          )}
+          {canArchive && (
+            <button
+              className="btn btn-secondary btn-sm"
+              disabled={!!actionLoading}
+              onClick={() => {
+                if (confirm('Отправить задачу в архив? Она исчезнет из общих списков.')) {
+                  doAction('archive', 'Задача отправлена в архив');
+                }
+              }}
+            >
+              {actionLoading === 'archive' ? '...' : 'В архив'}
             </button>
           )}
         </div>
