@@ -43,6 +43,8 @@ import {
 
   applyRequesterTaskFilter,
 
+  applyGroupTaskFilter,
+
   sortByCreatedAt,
 
   type GroupTaskFilter,
@@ -85,7 +87,13 @@ const GROUP_FILTERS: { id: GroupTaskFilter; label: string }[] = [
 
   { id: 'unassigned', label: 'Новые' },
 
+  { id: 'done', label: 'Выполненные' },
+
 ];
+
+
+
+const VALID_GROUP_FILTERS = new Set<GroupTaskFilter>(GROUP_FILTERS.map((f) => f.id));
 
 
 
@@ -125,7 +133,13 @@ function parseRequesterFilter(value: string | null): RequesterTaskFilter {
 
 function parseGroupFilter(value: string | null): GroupTaskFilter {
 
-  return value === 'unassigned' ? 'unassigned' : 'all';
+  if (value && VALID_GROUP_FILTERS.has(value as GroupTaskFilter)) {
+
+    return value as GroupTaskFilter;
+
+  }
+
+  return 'all';
 
 }
 
@@ -251,9 +265,15 @@ export function TasksPage() {
 
     }
 
+    if (mode === 'group') {
+
+      return applyGroupTaskFilter(tasks, groupFilter);
+
+    }
+
     return sortByCreatedAt(tasks);
 
-  }, [tasks, assignedTasks, createdTasks, mode, myFilter, requesterFilter, requester]);
+  }, [tasks, assignedTasks, createdTasks, mode, myFilter, requesterFilter, requester, groupFilter]);
 
 
 
@@ -308,6 +328,8 @@ export function TasksPage() {
       filters.my_group = true;
 
       if (groupFilter === 'unassigned') filters.status = 'new';
+
+      else if (groupFilter === 'done') filters.status = 'done';
 
     }
 

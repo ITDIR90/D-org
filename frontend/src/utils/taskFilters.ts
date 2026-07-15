@@ -1,7 +1,7 @@
 import type { Task } from '../api/tasks';
 
 export type MyTaskFilter = 'in_progress' | 'urgent' | 'done' | 'created_by_me' | 'all' | 'awaiting_confirmation';
-export type GroupTaskFilter = 'all' | 'unassigned';
+export type GroupTaskFilter = 'all' | 'unassigned' | 'done';
 export type RequesterTaskFilter = 'active' | 'awaiting_confirmation' | 'done' | 'cancelled' | 'all';
 
 export const MY_TASK_FILTERS: { id: MyTaskFilter; label: string }[] = [
@@ -117,4 +117,17 @@ export function countAwaitingRequesterTasks(tasks: Task[]) {
 
 export function countDoneRequesterTasks(tasks: Task[]) {
   return tasks.filter((t) => t.status === 'done').length;
+}
+
+export function applyGroupTaskFilter(tasks: Task[], filter: GroupTaskFilter): Task[] {
+  const sorted = sortByCreatedAt(tasks);
+  switch (filter) {
+    case 'unassigned':
+      return sorted.filter((t) => t.status === 'new');
+    case 'done':
+      return sorted.filter((t) => t.status === 'done');
+    case 'all':
+    default:
+      return sorted.filter((t) => t.status !== 'done');
+  }
 }
