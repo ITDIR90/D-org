@@ -134,8 +134,15 @@ export function ProfilePage() {
         res.delivery.telegram && 'telegram',
         res.delivery.max && 'MAX',
       ].filter(Boolean);
+      const maxIssue = res.delivery.skipped.find((item) => item.startsWith('max:'));
       if (sent.length > 0) {
-        setSuccess(`Тест отправлен: ${sent.join(', ')}`);
+        let message = `Тест отправлен: ${sent.join(', ')}`;
+        if (maxIssue && !res.delivery.max) {
+          message += `. ${maxIssue}`;
+        }
+        setSuccess(message);
+      } else if (maxIssue) {
+        setError(maxIssue);
       } else {
         setError(res.delivery.skipped.join('; ') || 'Ни один канал не отправил сообщение');
       }
