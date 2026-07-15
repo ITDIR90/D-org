@@ -8,6 +8,7 @@ from app.core.enums import ScheduleType, TaskStatus
 from app.db.session import async_session
 from app.models.recurring_task import RecurringTaskTemplate
 from app.models.task import Task
+from app.services.notification_service import notify_group_members_new_task
 
 
 def compute_next_run(template: RecurringTaskTemplate, from_dt: datetime | None = None) -> datetime:
@@ -46,6 +47,11 @@ async def create_task_from_template(db: AsyncSession, template: RecurringTaskTem
     template.last_run_at = now
     template.next_run_at = compute_next_run(template, now)
     await db.flush()
+
+    exclude: set[int] = {template.author_id}
+    if template.default_assignee_id:
+        exclude.add(template.default_assignee_id)
+    await notify_group_members_new_task(db, task, exclude_user_ids=exclude)
     return task
 
 
