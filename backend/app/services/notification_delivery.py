@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import get_settings
 from app.models.user import User
 from app.services.email_service import send_email
-from app.services.max_service import max_configured, send_max_message
+from app.services.max_service import max_config_reason, max_configured, send_max_message
 from app.services.push_service import push_configured, send_push_to_user, _push_reason
 from app.services.telegram_service import send_telegram_message, telegram_configured
 
@@ -61,13 +61,7 @@ def _telegram_reason(settings) -> str:
 
 
 def _max_reason(settings) -> str:
-    if not settings.MAX_ENABLED:
-        return "MAX_ENABLED=false в .env"
-    if not settings.MAX_GATEWAY_URL.strip():
-        return "Не задан MAX_GATEWAY_URL"
-    if not settings.MAX_GATEWAY_TOKEN.strip():
-        return "Не задан MAX_GATEWAY_TOKEN"
-    return "MAX не настроен"
+    return max_config_reason() or "MAX не настроен"
 
 
 async def deliver_notification(
@@ -76,6 +70,8 @@ async def deliver_notification(
     subject: str,
     body: str,
     push_data: dict | None = None,
+    *,
+    for_test: bool = False,
 ) -> dict:
     fresh = await db.get(User, recipient.id)
     user = fresh or recipient
@@ -97,7 +93,7 @@ async def deliver_notification(
             logger.warning("Email not sent to user %s: %s", user.id, reason)
     elif user.notify_via_email:
         result["skipped"].append("email: не указан адрес")
-    else:
+    elif not for_test:
         result["skipped"].append("email: отключено в профиле")
 
     if user.notify_via_telegram and user.telegram_chat_id:
@@ -115,20 +111,36 @@ async def deliver_notification(
             logger.warning("Telegram not sent to user %s: %s", user.id, reason)
     elif user.notify_via_telegram:
         result["skipped"].append("telegram: не указан chat_id")
-    else:
+    elif not for_test:
         result["skipped"].append("telegram: отключено в профиле")
 
-    if user.notify_via_max and user.max_user_id:
-        sent = await send_max_message(
+    if for_test:
+        if not max_configured():
+            result["skipped"].append(f"max: {max_config_reason()}")
+        elif user.max_user_id:
+            sent, error = await send_max_message(
+                db,
+                user_id=user.id,
+                max_user_id=int(user.max_user_id),
+                text=f"{subject}\n\n{body}",
+            )
+            result["max"] = sent
+            if not sent:
+                reason = error or "ошибка отправки"
+                result["skipped"].append(f"max: {reason}")
+                logger.warning("MAX not sent to user %s: %s", user.id, reason)
+        else:
+            result["skipped"].append("max: не указан user_id")
+    elif user.notify_via_max and user.max_user_id:
+        sent, error = await send_max_message(
             db,
             user_id=user.id,
-            max_user_id=user.max_user_id,
+            max_user_id=int(user.max_user_id),
             text=f"{subject}\n\n{body}",
         )
         result["max"] = sent
         if not sent:
-            channels = get_channels_status()
-            reason = channels["max"]["reason"] or "ошибка отправки"
+            reason = error or max_config_reason() or "ошибка отправки"
             result["skipped"].append(f"max: {reason}")
             logger.warning("MAX not sent to user %s: %s", user.id, reason)
     elif user.notify_via_max:
@@ -141,13 +153,15 @@ async def deliver_notification(
         result["push"] = sent
         if not sent:
             result["skipped"].append("push: нет зарегистрированных устройств или ошибка отправки")
-    else:
+    elif not for_test:
         result["skipped"].append("push: отключено в профиле")
 
     return result
 
 
 async def send_test_notification(db: AsyncSession, user: User) -> dict:
+    fresh = await db.get(User, user.id)
+    user = fresh or user
     subject = "Тестовое уведомление D-органайзер"
     body = "Если вы видите это сообщение — канал уведомлений работает."
     delivery = await deliver_notification(
@@ -156,6 +170,7 @@ async def send_test_notification(db: AsyncSession, user: User) -> dict:
         subject,
         body,
         push_data={"type": "test"},
+        for_test=True,
     )
     return {
         "channels": get_channels_status(),
