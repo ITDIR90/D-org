@@ -71,10 +71,10 @@ async def update_user(
         raise HTTPException(status_code=403, detail="Нельзя назначить роль супер-администратора")
     update = data.model_dump(exclude_unset=True)
     can_manage = actor.role == UserRole.SUPERADMIN or await can_manage_users(db, actor)
-    if actor.id == user_id:
+    if actor.id == user_id and not can_manage:
         for key in ("telegram_chat_id", "max_user_id"):
             update.pop(key, None)
-    elif not can_manage:
+    elif actor.id != user_id and not can_manage:
         for key in (
             "notify_via_email",
             "notify_via_telegram",

@@ -10,11 +10,13 @@ Help-Desk → `POST /api/v1/send` → Gateway → MAX API → пользоват
 
 Перед настройкой Help-Desk запросите у администратора:
 
-| Параметр | Пример | Описание |
-|----------|--------|----------|
-| **Base URL** | `https://max.mebel-alivia.ru` | Адрес gateway |
-| **Internal token** | `...` | `Authorization: Bearer <token>` |
-| **IP Help-Desk** | `203.0.113.50` | Для whitelist в nginx (если сервер вне VPN) |
+
+| Параметр           | Пример                        | Описание                                    |
+| ------------------ | ----------------------------- | ------------------------------------------- |
+| **Base URL**       | `https://max.mebel-alivia.ru` | Адрес gateway                               |
+| **Internal token** | `...`                         | `Authorization: Bearer <token>`             |
+| **IP Help-Desk**   | `203.0.113.50`                | Для whitelist в nginx (если сервер вне VPN) |
+
 
 Администратор добавит IP Help-Desk в `/etc/nginx/sites-available/max-gateway` → `location /api/` → `allow ...`.
 
@@ -66,12 +68,14 @@ Content-Type: application/json; charset=utf-8
 }
 ```
 
-| Поле | Тип | Обязательно | Описание |
-|------|-----|-------------|----------|
-| `user_id` | int | одно из двух | ID пользователя в MAX |
-| `chat_id` | int | одно из двух | ID чата в MAX |
-| `text` | string | да | Текст уведомления (1–4000 символов) |
-| `attachments` | array | нет | Кнопки / клавиатура (см. ниже) |
+
+| Поле          | Тип    | Обязательно  | Описание                            |
+| ------------- | ------ | ------------ | ----------------------------------- |
+| `user_id`     | int    | одно из двух | ID пользователя в MAX               |
+| `chat_id`     | int    | одно из двух | ID чата в MAX                       |
+| `text`        | string | да           | Текст уведомления (1–4000 символов) |
+| `attachments` | array  | нет          | Кнопки / клавиатура (см. ниже)      |
+
 
 **Ровно одно** из полей: `user_id` **или** `chat_id`.
 
@@ -89,12 +93,14 @@ Content-Type: application/json; charset=utf-8
 
 ### Ошибки
 
-| HTTP | Причина |
-|------|---------|
-| `401` | Неверный Bearer token |
-| `403` | IP Help-Desk не в whitelist nginx |
+
+| HTTP  | Причина                                          |
+| ----- | ------------------------------------------------ |
+| `401` | Неверный Bearer token                            |
+| `403` | IP Help-Desk не в whitelist nginx                |
 | `422` | Неверное тело (нет user_id/chat_id, пустой text) |
-| `502` | MAX не принял сообщение (смотреть `detail`) |
+| `502` | MAX не принял сообщение (смотреть `detail`)      |
+
 
 ---
 
@@ -150,7 +156,7 @@ Content-Type: application/json; charset=utf-8
 
 ### Шаг 3. ID пользователя MAX
 
-В карточке клиента / заявки должно храниться поле **`max_user_id`** (число), полученное при регистрации пользователя в боте или из другой интеграции.
+В карточке клиента / заявки должно храниться поле `**max_user_id**` (число), полученное при регистрации пользователя в боте или из другой интеграции.
 
 Без `user_id` или `chat_id` отправка невозможна.
 
@@ -234,17 +240,17 @@ print(response.json())
 
 **Администратор gateway:**
 
-- [ ] Выдан `INTERNAL_API_TOKEN` для Help-Desk
-- [ ] IP Help-Desk добавлен в nginx whitelist (`/api/`)
-- [ ] `curl` send с VPS/Help-Desk возвращает `200`
+- Выдан `INTERNAL_API_TOKEN` для Help-Desk
+- IP Help-Desk добавлен в nginx whitelist (`/api/`)
+- `curl` send с VPS/Help-Desk возвращает `200`
 
 **Help-Desk:**
 
-- [ ] Настроен HTTP POST на `/api/v1/send`
-- [ ] В заявках/клиентах есть `max_user_id` (или `chat_id`)
-- [ ] Шаблоны уведомлений заполнены
-- [ ] Триггеры на нужные события
-- [ ] Логирование ошибок HTTP
+- Настроен HTTP POST на `/api/v1/send`
+- В заявках/клиентах есть `max_user_id` (или `chat_id`)
+- Шаблоны уведомлений заполнены
+- Триггеры на нужные события
+- Логирование ошибок HTTP
 
 ---
 
@@ -271,3 +277,4 @@ Health gateway:
 ```bash
 curl -s https://max.mebel-alivia.ru/health
 ```
+
