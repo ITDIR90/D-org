@@ -104,3 +104,5 @@ class UserActionType(str, enum.Enum):
     EMAIL_ERROR = "email_error"
     TELEGRAM_SENT = "telegram_sent"
     TELEGRAM_ERROR = "telegram_error"
+    MAX_SENT = "max_sent"
+    MAX_ERROR = "max_error"

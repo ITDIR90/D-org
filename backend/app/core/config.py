@@ -34,6 +34,10 @@ class Settings(BaseSettings):
     TELEGRAM_BOT_TOKEN: str = ""
     TELEGRAM_ENABLED: bool = False
 
+    MAX_ENABLED: bool = False
+    MAX_GATEWAY_URL: str = ""
+    MAX_GATEWAY_TOKEN: str = ""
+
     PUSH_ENABLED: bool = True
     EXPO_ACCESS_TOKEN: str = ""
 

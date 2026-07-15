@@ -29,6 +29,7 @@ export function ProfilePage() {
         const parts: string[] = [];
         if (!ch.email.ready) parts.push(`Email: ${ch.email.reason}`);
         if (!ch.telegram.ready) parts.push(`Telegram: ${ch.telegram.reason}`);
+        if (!ch.max.ready) parts.push(`MAX: ${ch.max.reason}`);
         setChannelStatus(parts.join(' · '));
       })
       .catch(() => {});
@@ -88,7 +89,7 @@ export function ProfilePage() {
         ui_theme: form.ui_theme,
         notify_via_email: form.notify_via_email,
         notify_via_telegram: form.notify_via_telegram,
-        telegram_chat_id: form.telegram_chat_id || null,
+        notify_via_max: form.notify_via_max,
         role: selfOnly ? undefined : form.role,
         member_group_ids: selfOnly ? undefined : form.member_group_ids,
         task_target_group_ids: selfOnly ? undefined : form.task_target_group_ids,
@@ -118,6 +119,7 @@ export function ProfilePage() {
       const sent = [
         res.delivery.email && 'email',
         res.delivery.telegram && 'telegram',
+        res.delivery.max && 'MAX',
       ].filter(Boolean);
       if (sent.length > 0) {
         setSuccess(`Тест отправлен: ${sent.join(', ')}`);

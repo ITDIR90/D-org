@@ -21,7 +21,9 @@ export interface User {
   full_name: string;
   notify_via_email?: boolean;
   notify_via_telegram?: boolean;
+  notify_via_max?: boolean;
   telegram_chat_id?: string | null;
+  max_user_id?: number | null;
   printer?: string | null;
 }
 

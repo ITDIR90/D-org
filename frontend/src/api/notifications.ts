@@ -3,6 +3,7 @@ import { api } from './client';
 export interface NotificationChannels {
   email: { enabled: boolean; ready: boolean; reason: string | null };
   telegram: { enabled: boolean; ready: boolean; reason: string | null };
+  max: { enabled: boolean; ready: boolean; reason: string | null };
 }
 
 export interface NotificationTestResult {
@@ -11,11 +12,14 @@ export interface NotificationTestResult {
     email: string;
     notify_via_email: boolean;
     notify_via_telegram: boolean;
+    notify_via_max: boolean;
     telegram_chat_id: boolean;
+    max_user_id: boolean;
   };
   delivery: {
     email: boolean;
     telegram: boolean;
+    max: boolean;
     skipped: string[];
   };
 }

@@ -98,7 +98,7 @@ async def process_overdue_digests() -> None:
         changed = False
 
         for user in users:
-            if not user.notify_via_email and not user.notify_via_telegram and not user.notify_via_push:
+            if not user.notify_via_email and not user.notify_via_telegram and not user.notify_via_max and not user.notify_via_push:
                 continue
             try:
                 tz = ZoneInfo(user.timezone or "Europe/Moscow")
