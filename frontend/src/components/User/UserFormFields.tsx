@@ -172,7 +172,7 @@ export function UserFormFields({
           onConfirmChange={(confirm) => setPasswordForm((prev) => ({ ...prev, confirm }))}
         />
       )}
-      {isSelf && (
+      {isSelf && !(canManage && !selfOnly) && (
         <div className="profile-notifications card" style={{ marginTop: '1.25rem', padding: '1rem 1.25rem' }}>
           <h3 style={{ margin: '0 0 0.75rem', fontSize: '1rem' }}>Уведомления</h3>
           <p className="system-settings-hint" style={{ marginBottom: '1rem' }}>
@@ -204,7 +204,7 @@ export function UserFormFields({
           </label>
         </div>
       )}
-      {canManage && !selfOnly && isEdit && !isSelf && (
+      {canManage && !selfOnly && isEdit && (
         <div className="profile-notifications card" style={{ marginTop: '1.25rem', padding: '1rem 1.25rem' }}>
           <h3 style={{ margin: '0 0 0.75rem', fontSize: '1rem' }}>Уведомления</h3>
           <label className="system-settings-toggle" style={{ marginBottom: '0.75rem' }}>
@@ -246,7 +246,7 @@ export function UserFormFields({
               onChange={(e) => setForm({ ...form, max_user_id: e.target.value.replace(/\D/g, '') })}
               placeholder="Например: 190304297"
             />
-            <p className="form-hint">ID пользователя в мессенджере MAX. Настраивается администратором.</p>
+            <p className="form-hint">ID пользователя в мессенджере MAX.</p>
           </div>
         </div>
       )}

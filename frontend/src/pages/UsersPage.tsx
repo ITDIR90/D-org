@@ -207,15 +207,11 @@ export function UsersPage() {
         role: selfOnly ? undefined : form.role,
         member_group_ids: selfOnly ? undefined : form.member_group_ids,
         task_target_group_ids: selfOnly ? undefined : form.task_target_group_ids,
-        ...(isSelf
-          ? {
-              notify_via_email: form.notify_via_email,
-              notify_via_telegram: form.notify_via_telegram,
-              notify_via_max: form.notify_via_max,
-            }
-          : canManage
-            ? notificationPayload(form)
-            : {}),
+        ...(canManage ? notificationPayload(form) : {
+          notify_via_email: form.notify_via_email,
+          notify_via_telegram: form.notify_via_telegram,
+          notify_via_max: form.notify_via_max,
+        }),
       });
       await applyPasswordChange(editUser.id, isSelf);
       closeModal();

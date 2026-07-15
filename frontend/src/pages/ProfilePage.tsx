@@ -12,6 +12,13 @@ import {
   type UserForm,
 } from '../components/User/UserFormFields';
 
+function parseMaxUserId(value: string): number | null {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  const parsed = Number(trimmed);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
 export function ProfilePage() {
   const { user: me, refresh } = useAuth();
   const [groups, setGroups] = useState<{ id: number; name: string }[]>([]);
@@ -90,6 +97,12 @@ export function ProfilePage() {
         notify_via_email: form.notify_via_email,
         notify_via_telegram: form.notify_via_telegram,
         notify_via_max: form.notify_via_max,
+        ...(canManage && !selfOnly
+          ? {
+              telegram_chat_id: form.telegram_chat_id || null,
+              max_user_id: parseMaxUserId(form.max_user_id),
+            }
+          : {}),
         role: selfOnly ? undefined : form.role,
         member_group_ids: selfOnly ? undefined : form.member_group_ids,
         task_target_group_ids: selfOnly ? undefined : form.task_target_group_ids,
