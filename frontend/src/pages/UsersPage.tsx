@@ -25,6 +25,23 @@ const USER_SORT_ACCESSORS = {
   is_active: (u: User) => (u.is_active ? 1 : 0),
 };
 
+function parseMaxUserId(value: string): number | null {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  const parsed = Number(trimmed);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function notificationPayload(form: UserForm) {
+  return {
+    notify_via_email: form.notify_via_email,
+    notify_via_telegram: form.notify_via_telegram,
+    notify_via_max: form.notify_via_max,
+    telegram_chat_id: form.telegram_chat_id || null,
+    max_user_id: parseMaxUserId(form.max_user_id),
+  };
+}
+
 function serializeUserForm(f: UserForm): string {
   return JSON.stringify({
     ...f,
@@ -147,6 +164,7 @@ export function UsersPage() {
       await createUser({
         ...form,
         middle_name: form.middle_name || undefined,
+        ...notificationPayload(form),
       });
       closeModal();
       load();
@@ -189,6 +207,15 @@ export function UsersPage() {
         role: selfOnly ? undefined : form.role,
         member_group_ids: selfOnly ? undefined : form.member_group_ids,
         task_target_group_ids: selfOnly ? undefined : form.task_target_group_ids,
+        ...(isSelf
+          ? {
+              notify_via_email: form.notify_via_email,
+              notify_via_telegram: form.notify_via_telegram,
+              notify_via_max: form.notify_via_max,
+            }
+          : canManage
+            ? notificationPayload(form)
+            : {}),
       });
       await applyPasswordChange(editUser.id, isSelf);
       closeModal();

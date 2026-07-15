@@ -23,7 +23,9 @@ export const EMPTY_CREATE = {
   task_target_group_ids: [] as number[],
   notify_via_email: true,
   notify_via_telegram: false,
+  notify_via_max: false,
   telegram_chat_id: '',
+  max_user_id: '',
   printer: '',
 };
 
@@ -53,7 +55,9 @@ export function userToForm(u: User): UserForm {
     task_target_group_ids: [...u.task_target_group_ids],
     notify_via_email: u.notify_via_email ?? true,
     notify_via_telegram: u.notify_via_telegram ?? false,
+    notify_via_max: u.notify_via_max ?? false,
     telegram_chat_id: u.telegram_chat_id || '',
+    max_user_id: u.max_user_id != null ? String(u.max_user_id) : '',
     printer: u.printer || '',
   };
 }
@@ -172,7 +176,7 @@ export function UserFormFields({
         <div className="profile-notifications card" style={{ marginTop: '1.25rem', padding: '1rem 1.25rem' }}>
           <h3 style={{ margin: '0 0 0.75rem', fontSize: '1rem' }}>Уведомления</h3>
           <p className="system-settings-hint" style={{ marginBottom: '1rem' }}>
-            Выберите каналы для уведомлений о задачах. Мобильное приложение будет добавлено позже.
+            Выберите каналы для уведомлений о задачах. ID мессенджеров настраивает администратор.
           </p>
           <label className="system-settings-toggle" style={{ marginBottom: '0.75rem' }}>
             <input
@@ -190,19 +194,105 @@ export function UserFormFields({
             />
             <span>Telegram</span>
           </label>
-          {form.notify_via_telegram && (
-            <div className="form-group" style={{ marginBottom: 0 }}>
-              <label>Telegram Chat ID</label>
-              <input
-                value={form.telegram_chat_id}
-                onChange={(e) => setForm({ ...form, telegram_chat_id: e.target.value })}
-                placeholder="Например: 123456789"
-              />
-              <p className="form-hint">
-                Напишите боту /start и укажите полученный chat_id. Настройте TELEGRAM_BOT_TOKEN на сервере.
-              </p>
-            </div>
-          )}
+          <label className="system-settings-toggle" style={{ marginBottom: '0.75rem' }}>
+            <input
+              type="checkbox"
+              checked={form.notify_via_max}
+              onChange={(e) => setForm({ ...form, notify_via_max: e.target.checked })}
+            />
+            <span>MAX</span>
+          </label>
+        </div>
+      )}
+      {canManage && !selfOnly && isEdit && !isSelf && (
+        <div className="profile-notifications card" style={{ marginTop: '1.25rem', padding: '1rem 1.25rem' }}>
+          <h3 style={{ margin: '0 0 0.75rem', fontSize: '1rem' }}>Уведомления</h3>
+          <label className="system-settings-toggle" style={{ marginBottom: '0.75rem' }}>
+            <input
+              type="checkbox"
+              checked={form.notify_via_email}
+              onChange={(e) => setForm({ ...form, notify_via_email: e.target.checked })}
+            />
+            <span>Email</span>
+          </label>
+          <label className="system-settings-toggle" style={{ marginBottom: '0.75rem' }}>
+            <input
+              type="checkbox"
+              checked={form.notify_via_telegram}
+              onChange={(e) => setForm({ ...form, notify_via_telegram: e.target.checked })}
+            />
+            <span>Telegram</span>
+          </label>
+          <label className="system-settings-toggle" style={{ marginBottom: '0.75rem' }}>
+            <input
+              type="checkbox"
+              checked={form.notify_via_max}
+              onChange={(e) => setForm({ ...form, notify_via_max: e.target.checked })}
+            />
+            <span>MAX</span>
+          </label>
+          <div className="form-group" style={{ marginBottom: '0.75rem' }}>
+            <label>Telegram Chat ID</label>
+            <input
+              value={form.telegram_chat_id}
+              onChange={(e) => setForm({ ...form, telegram_chat_id: e.target.value })}
+              placeholder="Например: 123456789"
+            />
+          </div>
+          <div className="form-group" style={{ marginBottom: 0 }}>
+            <label>MAX User ID</label>
+            <input
+              value={form.max_user_id}
+              onChange={(e) => setForm({ ...form, max_user_id: e.target.value.replace(/\D/g, '') })}
+              placeholder="Например: 190304297"
+            />
+            <p className="form-hint">ID пользователя в мессенджере MAX. Настраивается администратором.</p>
+          </div>
+        </div>
+      )}
+      {!isEdit && canManage && !selfOnly && (
+        <div className="profile-notifications card" style={{ marginTop: '1.25rem', padding: '1rem 1.25rem' }}>
+          <h3 style={{ margin: '0 0 0.75rem', fontSize: '1rem' }}>Уведомления</h3>
+          <label className="system-settings-toggle" style={{ marginBottom: '0.75rem' }}>
+            <input
+              type="checkbox"
+              checked={form.notify_via_email}
+              onChange={(e) => setForm({ ...form, notify_via_email: e.target.checked })}
+            />
+            <span>Email</span>
+          </label>
+          <label className="system-settings-toggle" style={{ marginBottom: '0.75rem' }}>
+            <input
+              type="checkbox"
+              checked={form.notify_via_telegram}
+              onChange={(e) => setForm({ ...form, notify_via_telegram: e.target.checked })}
+            />
+            <span>Telegram</span>
+          </label>
+          <label className="system-settings-toggle" style={{ marginBottom: '0.75rem' }}>
+            <input
+              type="checkbox"
+              checked={form.notify_via_max}
+              onChange={(e) => setForm({ ...form, notify_via_max: e.target.checked })}
+            />
+            <span>MAX</span>
+          </label>
+          <div className="form-group" style={{ marginBottom: '0.75rem' }}>
+            <label>Telegram Chat ID</label>
+            <input
+              value={form.telegram_chat_id}
+              onChange={(e) => setForm({ ...form, telegram_chat_id: e.target.value })}
+              placeholder="Например: 123456789"
+            />
+          </div>
+          <div className="form-group" style={{ marginBottom: 0 }}>
+            <label>MAX User ID</label>
+            <input
+              value={form.max_user_id}
+              onChange={(e) => setForm({ ...form, max_user_id: e.target.value.replace(/\D/g, '') })}
+              placeholder="Например: 190304297"
+            />
+          </div>
         </div>
       )}
       {canManage && !selfOnly && (

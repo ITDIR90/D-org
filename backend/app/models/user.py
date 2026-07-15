@@ -1,6 +1,6 @@
 from datetime import date, datetime
 
-from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint, func
+from sqlalchemy import BigInteger, Boolean, Date, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.enums import UiTheme, UserRole, pg_enum
@@ -22,7 +22,9 @@ class User(Base):
     notify_via_email: Mapped[bool] = mapped_column(Boolean, default=True)
     notify_via_telegram: Mapped[bool] = mapped_column(Boolean, default=False)
     notify_via_push: Mapped[bool] = mapped_column(Boolean, default=True)
+    notify_via_max: Mapped[bool] = mapped_column(Boolean, default=False)
     telegram_chat_id: Mapped[str | None] = mapped_column(String(50))
+    max_user_id: Mapped[int | None] = mapped_column(BigInteger)
     printer: Mapped[str | None] = mapped_column(String(255))
     overdue_digest_sent_on: Mapped[date | None] = mapped_column(Date)
     role: Mapped[UserRole] = mapped_column(pg_enum(UserRole, "user_role"), default=UserRole.USER)
