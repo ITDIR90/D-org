@@ -43,6 +43,9 @@ def _format_max_http_error(status_code: int, detail: str) -> str:
     if status_code == 401:
         return "401 Unauthorized: неверный MAX_GATEWAY_TOKEN (INTERNAL_API_TOKEN gateway)"
     return f"HTTP {status_code}: {detail}"
+
+
+async def send_max_message(
     db: AsyncSession,
     user_id: int | None,
     max_user_id: int,
