@@ -30,7 +30,19 @@ def max_config_reason() -> str | None:
     return None
 
 
-async def send_max_message(
+def _format_max_http_error(status_code: int, detail: str) -> str:
+    if status_code == 403:
+        return (
+            "403 Forbidden: IP сервера D-org не в whitelist nginx Gateway. "
+            "На сервере max.mebel-alivia.ru добавьте внешний IP D-org в "
+            "/etc/nginx/sites-available/max-gateway (location /api/) и выполните "
+            "nginx -t && systemctl reload nginx. "
+            "Если оба сервиса на одном VPS — укажите "
+            "MAX_GATEWAY_URL=http://host.docker.internal:8000/api/v1/send в .env D-org."
+        )
+    if status_code == 401:
+        return "401 Unauthorized: неверный MAX_GATEWAY_TOKEN (INTERNAL_API_TOKEN gateway)"
+    return f"HTTP {status_code}: {detail}"
     db: AsyncSession,
     user_id: int | None,
     max_user_id: int,
@@ -77,7 +89,8 @@ async def send_max_message(
                 detail = str(body["detail"])[:500]
         except Exception:
             pass
-        logger.warning("MAX send failed: HTTP %s %s", exc.response.status_code, detail)
+        detail = _format_max_http_error(exc.response.status_code, detail)
+        logger.warning("MAX send failed: %s", detail)
         try:
             await log_user_action(
                 db,

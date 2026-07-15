@@ -198,18 +198,7 @@ async def create_task(
     )
     db.add(task)
     await db.flush()
-    exclude_notify: set[int] = {user.id}
-    if task.assignee_id:
-        assignee = await db.get(User, task.assignee_id)
-        if assignee:
-            exclude_notify.add(assignee.id)
-            await create_notification(
-                db, assignee.id, NotificationType.ASSIGNED,
-                "Назначение ответственным",
-                f"Вам назначена задача: {task.title}",
-                EntityType.TASK, task.id, assignee,
-            )
-    await notify_group_members_new_task(db, task, exclude_user_ids=exclude_notify)
+    await notify_group_members_new_task(db, task, exclude_user_ids={user.id})
     await log_user_action(
         db, user.id, UserActionType.TASK_CREATE, EntityType.TASK, task.id, ip_address=ip_address, user_agent=user_agent
     )

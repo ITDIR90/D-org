@@ -48,10 +48,7 @@ async def create_task_from_template(db: AsyncSession, template: RecurringTaskTem
     template.next_run_at = compute_next_run(template, now)
     await db.flush()
 
-    exclude: set[int] = {template.author_id}
-    if template.default_assignee_id:
-        exclude.add(template.default_assignee_id)
-    await notify_group_members_new_task(db, task, exclude_user_ids=exclude)
+    await notify_group_members_new_task(db, task, exclude_user_ids={template.author_id})
     return task
 
 

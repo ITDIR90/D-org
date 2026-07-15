@@ -20,6 +20,8 @@ services:
     build: ./backend
     restart: unless-stopped
     env_file: .env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
       DATABASE_URL: postgresql+asyncpg://helpdesk:${POSTGRES_PASSWORD:-change_db_password}@db:5432/helpdesk
     depends_on:
