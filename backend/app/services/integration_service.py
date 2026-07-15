@@ -116,6 +116,7 @@ async def create_integration_request(
     await db.flush()
 
     from app.services.audit_service import log_user_action
+    from app.services.notification_service import notify_group_members_new_task
 
     await log_user_action(
         db,
@@ -127,6 +128,8 @@ async def create_integration_request(
         ip_address=ip_address,
         user_agent=user_agent,
     )
+
+    await notify_group_members_new_task(db, task, exclude_user_ids={user.id})
 
     return IntegrationRequestRead(
         id=task.id,
