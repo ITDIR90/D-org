@@ -97,7 +97,7 @@ Content-Type: application/json; charset=utf-8
 | HTTP  | Причина                                          |
 | ----- | ------------------------------------------------ |
 | `401` | Неверный Bearer token                            |
-| `403` | IP Help-Desk не в whitelist nginx                |
+| `403` | IP Help-Desk не в whitelist nginx — см. раздел 10 ниже |
 | `422` | Неверное тело (нет user_id/chat_id, пустой text) |
 | `502` | MAX не принял сообщение (смотреть `detail`)      |
 
@@ -276,5 +276,72 @@ Health gateway:
 
 ```bash
 curl -s https://max.mebel-alivia.ru/health
+```
+
+---
+
+## 10. Ошибка 403 Forbidden
+
+Nginx Gateway разрешает `/api/` только с IP из whitelist. Публичный URL `https://max.mebel-alivia.ru/api/v1/send` с сервера D-org часто получает **403**, если внешний IP D-org не добавлен в nginx.
+
+### Вариант A — D-org и Gateway на одном VPS (рекомендуется)
+
+В `.env` D-org укажите прямой доступ к приложению gateway (минуя nginx):
+
+```env
+MAX_GATEWAY_URL=http://host.docker.internal:8000/api/v1/send
+```
+
+В `docker-compose.prod.yml` backend должен иметь:
+
+```yaml
+extra_hosts:
+  - "host.docker.internal:host-gateway"
+```
+
+Пересоберите backend:
+
+```bash
+cd ~/D-org && docker compose -f docker-compose.prod.yml up -d --build backend
+```
+
+Проверка с сервера D-org:
+
+```bash
+docker compose -f docker-compose.prod.yml exec backend python -c "
+import httpx, os
+url = os.environ.get('MAX_GATEWAY_URL', '')
+token = os.environ.get('MAX_GATEWAY_TOKEN', '')
+r = httpx.post(url, json={'user_id': 1, 'text': 'test'}, headers={'Authorization': f'Bearer {token}'}, timeout=10)
+print(r.status_code, r.text[:200])
+"
+```
+
+Ожидаемо: `200` или `502` (если user_id тестовый не существует в MAX), но **не 403**.
+
+### Вариант B — серверы на разных IP
+
+1. Узнайте внешний IP сервера D-org:
+
+```bash
+curl -s ifconfig.me
+```
+
+2. На сервере `max.mebel-alivia.ru` откройте `/etc/nginx/sites-available/max-gateway`, в блоке `location /api/` добавьте:
+
+```nginx
+allow 203.0.113.50/32;   # IP сервера ai.mebel-alivia.ru
+```
+
+3. Примените конфиг:
+
+```bash
+nginx -t && systemctl reload nginx
+```
+
+4. В `.env` D-org оставьте публичный URL:
+
+```env
+MAX_GATEWAY_URL=https://max.mebel-alivia.ru/api/v1/send
 ```
 
