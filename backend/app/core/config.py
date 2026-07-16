@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     APP_TAGLINE: str = "единый центр задач, проектов и коммуникаций"
     APP_ENV: str = "development"
     SECRET_KEY: str = "change-me"
-    JWT_EXPIRE_MINUTES: int = 60
+    JWT_EXPIRE_MINUTES: int = 600
     DATABASE_URL: str = "postgresql+asyncpg://helpdesk:helpdesk@db:5432/helpdesk"
     BACKEND_CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
 

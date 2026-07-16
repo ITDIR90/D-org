@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   getTask, getComments, getHistory, addComment,
   taskAction, updateTask,
@@ -11,6 +11,7 @@ import { useAuth } from '../auth/AuthContext';
 import { showAiNotice } from '../api/client';
 import { listUsers } from '../api/users';
 import { buildUserNameMap, formatChangeLogMessage } from '../utils/changeLogFormat';
+import { askSaveOrDiscard } from '../utils/unsavedChanges';
 
 function toDatetimeLocalValue(iso: string): string {
   const d = new Date(iso);
@@ -21,6 +22,7 @@ function toDatetimeLocalValue(iso: string): string {
 
 export function TaskDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [task, setTask] = useState<Task | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
@@ -65,6 +67,13 @@ export function TaskDetailPage() {
   const groupMembers = users.filter((u) => u.member_group_ids?.includes(task.target_group_id));
   const userNames = buildUserNameMap(users);
 
+  const assigneeDirty = editAssigneeId !== (task.assignee_id ? String(task.assignee_id) : '');
+  const dueDirty = Boolean(editDueAt) && editDueAt !== toDatetimeLocalValue(task.due_at);
+  const notifyDirty = Number(notifyBeforeMinutes) !== task.notify_before_minutes;
+  const spentDirty = Boolean(spentHours.trim());
+  const commentDirty = Boolean(commentText.trim());
+  const isDirty = assigneeDirty || dueDirty || notifyDirty || spentDirty || commentDirty;
+
   const showMessage = (msg: string) => {
     setActionMessage(msg);
     setActionError('');
@@ -97,6 +106,7 @@ export function TaskDetailPage() {
       showMessage('Ответственный обновлён');
     } catch (err) {
       setActionError(err instanceof Error ? err.message : 'Ошибка назначения');
+      throw err;
     } finally {
       setActionLoading(null);
     }
@@ -105,7 +115,7 @@ export function TaskDetailPage() {
   const handleDueAtSave = async () => {
     if (!editDueAt) {
       setActionError('Укажите срок выполнения');
-      return;
+      throw new Error('due_at required');
     }
     if (editDueAt === toDatetimeLocalValue(task.due_at)) return;
     setActionLoading('due');
@@ -116,13 +126,15 @@ export function TaskDetailPage() {
       showMessage('Срок выполнения обновлён');
     } catch (err) {
       setActionError(err instanceof Error ? err.message : 'Ошибка сохранения срока');
+      throw err;
     } finally {
       setActionLoading(null);
     }
   };
 
-  const handleComment = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleComment = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!commentText.trim()) return;
     setActionError('');
     try {
       const res = await addComment(task.id, commentText);
@@ -132,6 +144,7 @@ export function TaskDetailPage() {
       showMessage('Комментарий добавлен');
     } catch (err) {
       setActionError(err instanceof Error ? err.message : 'Ошибка отправки комментария');
+      throw err;
     }
   };
 
@@ -145,6 +158,7 @@ export function TaskDetailPage() {
       showMessage('Затраченное время сохранено');
     } catch (err) {
       setActionError(err instanceof Error ? err.message : 'Ошибка сохранения времени');
+      throw err;
     }
   };
 
@@ -152,7 +166,7 @@ export function TaskDetailPage() {
     const next = Number(notifyBeforeMinutes);
     if (Number.isNaN(next) || next < 0) {
       setActionError('Укажите корректное количество минут');
-      return;
+      throw new Error('invalid notify');
     }
     if (next === task.notify_before_minutes) return;
     setActionLoading('notify');
@@ -163,9 +177,36 @@ export function TaskDetailPage() {
       showMessage('Настройка напоминания сохранена');
     } catch (err) {
       setActionError(err instanceof Error ? err.message : 'Ошибка сохранения');
+      throw err;
     } finally {
       setActionLoading(null);
     }
+  };
+
+  const savePendingChanges = async () => {
+    if (assigneeDirty && isAdmin) await handleAssigneeSave();
+    if (dueDirty && isAdmin) await handleDueAtSave();
+    if (notifyDirty && (isAuthor || isAdmin) && isActive) await handleNotifyBeforeSave();
+    if (spentDirty && (isAssignee || isAdmin) && isActive) await handleSpent();
+    if (commentDirty) await handleComment();
+  };
+
+  const handleClose = async () => {
+    if (!isDirty) {
+      navigate(-1);
+      return;
+    }
+    const decision = askSaveOrDiscard('Сохранить изменения перед закрытием?');
+    if (decision === 'save') {
+      try {
+        await savePendingChanges();
+        navigate(-1);
+      } catch {
+        // stay on page — error already shown
+      }
+      return;
+    }
+    navigate(-1);
   };
 
   const formatDate = (d?: string) => d ? new Date(d).toLocaleString('ru-RU') : '—';
@@ -242,6 +283,14 @@ export function TaskDetailPage() {
               {actionLoading === 'archive' ? '...' : 'В архив'}
             </button>
           )}
+          <button
+            type="button"
+            className="btn btn-secondary btn-sm"
+            onClick={() => void handleClose()}
+            title="Закрыть"
+          >
+            Закрыть
+          </button>
         </div>
       </div>
 
@@ -285,8 +334,8 @@ export function TaskDetailPage() {
                 <button
                   type="button"
                   className="btn btn-primary btn-sm"
-                  disabled={actionLoading === 'assign' || editAssigneeId === (task.assignee_id ? String(task.assignee_id) : '')}
-                  onClick={handleAssigneeSave}
+                  disabled={actionLoading === 'assign' || !assigneeDirty}
+                  onClick={() => void handleAssigneeSave()}
                 >
                   {actionLoading === 'assign' ? 'Сохранение...' : 'Сохранить'}
                 </button>
@@ -309,8 +358,8 @@ export function TaskDetailPage() {
                 <button
                   type="button"
                   className="btn btn-primary btn-sm"
-                  disabled={actionLoading === 'due' || editDueAt === toDatetimeLocalValue(task.due_at)}
-                  onClick={handleDueAtSave}
+                  disabled={actionLoading === 'due' || !dueDirty}
+                  onClick={() => void handleDueAtSave()}
                 >
                   {actionLoading === 'due' ? 'Сохранение...' : 'Сохранить'}
                 </button>
@@ -333,7 +382,7 @@ export function TaskDetailPage() {
                     placeholder="0"
                   />
                 </div>
-                <button className="btn btn-secondary btn-sm" onClick={handleSpent}>
+                <button className="btn btn-secondary btn-sm" onClick={() => void handleSpent()}>
                   Сохранить
                 </button>
               </div>
@@ -360,8 +409,8 @@ export function TaskDetailPage() {
             <button
               type="button"
               className="btn btn-secondary btn-sm"
-              disabled={actionLoading === 'notify' || Number(notifyBeforeMinutes) === task.notify_before_minutes}
-              onClick={handleNotifyBeforeSave}
+              disabled={actionLoading === 'notify' || !notifyDirty}
+              onClick={() => void handleNotifyBeforeSave()}
             >
               {actionLoading === 'notify' ? 'Сохранение...' : 'Сохранить'}
             </button>
@@ -379,7 +428,7 @@ export function TaskDetailPage() {
             </div>
           ))}
         </div>
-        <form onSubmit={handleComment} style={{ marginTop: '1rem' }}>
+        <form onSubmit={(e) => void handleComment(e)} style={{ marginTop: '1rem' }}>
           <div className="form-group">
             <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} placeholder="Добавить комментарий..." required />
           </div>
