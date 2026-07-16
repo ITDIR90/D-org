@@ -24,6 +24,7 @@ from app.models.user import User
 from app.schemas.task import TaskCreate, TaskRead, TaskUpdate
 from app.services.ai_service import ModerationError, process_fields
 from app.services.audit_service import log_field_changes, log_task_change, log_user_action
+from app.services.duplicate_message_service import DuplicateTaskError, assert_task_not_duplicate
 from app.services.notification_service import create_notification, notify_group_members_new_task
 
 
@@ -151,6 +152,17 @@ async def create_task(
 ) -> tuple[Task, bool]:
     if not await can_create_task_in_group(db, user, data.target_group_id):
         raise HTTPException(status_code=403, detail="Нет прав создать задачу в этой группе")
+
+    try:
+        await assert_task_not_duplicate(
+            db,
+            user.id,
+            data.title,
+            data.target_group_id,
+            category_id=data.category_id,
+        )
+    except DuplicateTaskError as e:
+        raise HTTPException(status_code=429, detail=str(e)) from e
 
     cat_result = await db.execute(select(Category).where(Category.id == data.category_id))
     category = cat_result.scalar_one_or_none()

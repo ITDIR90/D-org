@@ -45,6 +45,7 @@ class Settings(BaseSettings):
     DEFAULT_SUPERADMIN_PASSWORD: str = "admin12345"
 
     DUPLICATE_MESSAGE_WINDOW_SECONDS: int = 30
+    DUPLICATE_TASK_WINDOW_SECONDS: int = 60
 
     INTEGRATION_API_ENABLED: bool = False
     INTEGRATION_API_KEY: str = ""
