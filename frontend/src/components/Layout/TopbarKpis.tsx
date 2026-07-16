@@ -11,9 +11,10 @@ import {
   countAwaitingConfirmationTasks,
   countInProgressTasks,
   countUrgentTasks,
+  countOverdueTasks,
 } from '../../utils/taskFilters';
 
-type KpiAccent = 'progress' | 'urgent' | 'new' | 'confirm' | 'done';
+type KpiAccent = 'progress' | 'urgent' | 'overdue' | 'new' | 'confirm' | 'done';
 
 interface KpiItem {
   id: string;
@@ -36,6 +37,14 @@ function KpiIcon({ accent }: { accent: KpiAccent }) {
     return (
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
         <path d="M9.2 2.4 4.8 9.2H8l-.8 4.4 4.4-6.8H8.8l.4-4.4Z" fill="currentColor" />
+      </svg>
+    );
+  }
+  if (accent === 'overdue') {
+    return (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
+        <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M8 4.5v4M8 11h.01" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
       </svg>
     );
   }
@@ -69,6 +78,7 @@ export function TopbarKpis() {
   const [counts, setCounts] = useState({
     inProgress: 0,
     urgent: 0,
+    overdue: 0,
     newTasks: 0,
     awaiting: 0,
     done: 0,
@@ -83,6 +93,7 @@ export function TopbarKpis() {
           setCounts({
             inProgress: countActiveRequesterTasks(tasks),
             urgent: 0,
+            overdue: countOverdueTasks(tasks),
             newTasks: 0,
             awaiting: countAwaitingRequesterTasks(tasks),
             done: countDoneRequesterTasks(tasks),
@@ -104,6 +115,7 @@ export function TopbarKpis() {
       setCounts({
         inProgress: countInProgressTasks(myTasks),
         urgent: countUrgentTasks(myTasks),
+        overdue: countOverdueTasks(myTasks),
         newTasks: newTasks.length,
         awaiting: countAwaitingConfirmationTasks(myTasks, createdTasks),
         done: 0,
@@ -136,6 +148,13 @@ export function TopbarKpis() {
           accent: 'progress',
         },
         {
+          id: 'overdue',
+          to: '/tasks/my?filter=overdue',
+          label: 'Просроченные',
+          count: counts.overdue,
+          accent: 'overdue',
+        },
+        {
           id: 'awaiting_confirmation',
           to: '/tasks/my?filter=awaiting_confirmation',
           label: 'На подтверждении',
@@ -164,6 +183,13 @@ export function TopbarKpis() {
           label: 'Срочные',
           count: counts.urgent,
           accent: 'urgent',
+        },
+        {
+          id: 'overdue',
+          to: '/tasks/my?filter=overdue',
+          label: 'Просроченные',
+          count: counts.overdue,
+          accent: 'overdue',
         },
         {
           id: 'new',

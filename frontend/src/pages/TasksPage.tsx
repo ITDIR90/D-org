@@ -30,6 +30,7 @@ import { useAuth } from '../auth/AuthContext';
 
 import { showAiNotice, showToast } from '../utils/toast';
 import { notifyTasksChanged } from '../utils/taskEvents';
+import { askSaveOrDiscard, isFormChanged } from '../utils/unsavedChanges';
 
 import { isRequestOnly } from '../constants/roles';
 
@@ -498,15 +499,52 @@ export function TasksPage() {
 
 
 
-  const closeCreate = () => {
+  const isCreateDirty = () =>
+    selectedTemplateId != null || isFormChanged(form, EMPTY_TASK_FORM);
 
+  const leaveCreate = () => {
     setShowCreate(false);
-
     resetForm();
-
     setError('');
-
+    if (mode === 'new') {
+      navigate('/tasks/my');
+    }
   };
+
+  const closeCreate = async () => {
+    if (!isCreateDirty()) {
+      leaveCreate();
+      return;
+    }
+    const decision = askSaveOrDiscard(
+      requester
+        ? 'Сохранить новую заявку перед выходом?'
+        : 'Сохранить новую задачу перед выходом?',
+    );
+    if (decision === 'save') {
+      if (!form.title.trim() || !form.target_group_id || !form.category_id) {
+        setError('Заполните обязательные поля, чтобы сохранить заявку');
+        return;
+      }
+      const fakeEvent = { preventDefault() {} } as React.FormEvent;
+      await handleCreate(fakeEvent);
+      return;
+    }
+    leaveCreate();
+  };
+
+  useEffect(() => {
+    const dirty =
+      (mode === 'new' || showCreate) &&
+      (selectedTemplateId != null || isFormChanged(form, EMPTY_TASK_FORM));
+    if (!dirty) return;
+    const onBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = '';
+    };
+    window.addEventListener('beforeunload', onBeforeUnload);
+    return () => window.removeEventListener('beforeunload', onBeforeUnload);
+  }, [mode, showCreate, form, selectedTemplateId]);
 
 
 
@@ -550,7 +588,7 @@ export function TasksPage() {
 
       />
 
-      <TaskCreateForm {...formProps} onCancel={mode !== 'new' ? closeCreate : undefined} />
+      <TaskCreateForm {...formProps} onCancel={() => void closeCreate()} />
 
     </div>
 
@@ -580,7 +618,12 @@ export function TasksPage() {
 
         <TasksSectionNav />
 
-        <div className="page-header"><h1>{titles.new}</h1></div>
+        <div className="page-header">
+          <h1>{titles.new}</h1>
+          <button type="button" className="btn btn-secondary btn-sm" onClick={() => void closeCreate()}>
+            ← Назад
+          </button>
+        </div>
 
         {createBlock}
 
@@ -712,7 +755,7 @@ export function TasksPage() {
 
       )}
 
-      <Modal open={showCreate} onClose={closeCreate} title={titles.new}>
+      <Modal open={showCreate} onClose={() => void closeCreate()} title={titles.new}>
 
         <RequestTemplatePicker
 
@@ -726,7 +769,7 @@ export function TasksPage() {
 
         />
 
-        <TaskCreateForm {...formProps} onCancel={closeCreate} />
+        <TaskCreateForm {...formProps} onCancel={() => void closeCreate()} />
 
       </Modal>
 

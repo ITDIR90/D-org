@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { listInfopanelTasks, type Task } from '../api/tasks';
 import { PriorityBadge } from '../components/PriorityBadge/PriorityBadge';
 import { LogoMark, LogoText } from '../components/Logo/Logo';
@@ -60,10 +61,19 @@ function InfoPanelCard({ task }: { task: Task }) {
 }
 
 export function InfoPanelPage() {
+  const navigate = useNavigate();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [now, setNow] = useState(() => new Date());
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
+
+  const goBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+      return;
+    }
+    navigate('/');
+  };
 
   const load = useCallback(async () => {
     try {
@@ -105,6 +115,9 @@ export function InfoPanelPage() {
 
   return (
     <div className="infopanel-page">
+      <button type="button" className="infopanel-back-btn" onClick={goBack} title="Назад">
+        ← Назад
+      </button>
       <header className="infopanel-header">
         <div className="infopanel-brand">
           <LogoMark size={44} variant="light" animated />

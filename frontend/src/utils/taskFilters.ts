@@ -1,12 +1,13 @@
 import type { Task } from '../api/tasks';
 
-export type MyTaskFilter = 'in_progress' | 'urgent' | 'done' | 'created_by_me' | 'all' | 'awaiting_confirmation';
+export type MyTaskFilter = 'in_progress' | 'urgent' | 'overdue' | 'done' | 'created_by_me' | 'all' | 'awaiting_confirmation';
 export type GroupTaskFilter = 'all' | 'unassigned' | 'done';
-export type RequesterTaskFilter = 'active' | 'awaiting_confirmation' | 'done' | 'cancelled' | 'all';
+export type RequesterTaskFilter = 'active' | 'awaiting_confirmation' | 'overdue' | 'done' | 'cancelled' | 'all';
 
 export const MY_TASK_FILTERS: { id: MyTaskFilter; label: string }[] = [
   { id: 'in_progress', label: 'В работе' },
   { id: 'urgent', label: 'Срочные' },
+  { id: 'overdue', label: 'Просроченные' },
   { id: 'awaiting_confirmation', label: 'На подтверждении' },
   { id: 'done', label: 'Выполненные' },
   { id: 'created_by_me', label: 'Созданные мной' },
@@ -31,6 +32,14 @@ export function countInProgressTasks(tasks: Task[]) {
 
 export function countUrgentTasks(tasks: Task[]) {
   return tasks.filter(isUrgentTask).length;
+}
+
+export function isOverdueTask(task: Task) {
+  return Boolean(task.is_overdue) && isActiveTask(task);
+}
+
+export function countOverdueTasks(tasks: Task[]) {
+  return tasks.filter(isOverdueTask).length;
 }
 
 export function isAwaitingConfirmationTask(task: Task) {
@@ -66,6 +75,8 @@ export function applyMyTaskFilter(
       return sortByCreatedAt(assignedTasks.filter(isInProgressTask));
     case 'urgent':
       return sortByCreatedAt(assignedTasks.filter(isUrgentTask));
+    case 'overdue':
+      return sortByCreatedAt(assignedTasks.filter(isOverdueTask));
     case 'awaiting_confirmation': {
       const seen = new Set<number>();
       return sortByCreatedAt(
@@ -85,6 +96,7 @@ export function applyMyTaskFilter(
 
 export const REQUESTER_TASK_FILTERS: { id: RequesterTaskFilter; label: string }[] = [
   { id: 'active', label: 'В работе' },
+  { id: 'overdue', label: 'Просроченные' },
   { id: 'awaiting_confirmation', label: 'На подтверждении' },
   { id: 'cancelled', label: 'Отменённые' },
   { id: 'all', label: 'Все заявки' },
@@ -95,6 +107,8 @@ export function applyRequesterTaskFilter(tasks: Task[], filter: RequesterTaskFil
   switch (filter) {
     case 'active':
       return sorted.filter((t) => ['new', 'in_progress'].includes(t.status));
+    case 'overdue':
+      return sorted.filter(isOverdueTask);
     case 'awaiting_confirmation':
       return sorted.filter(isAwaitingConfirmationTask);
     case 'done':
