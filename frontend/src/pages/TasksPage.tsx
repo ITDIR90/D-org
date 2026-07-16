@@ -206,6 +206,8 @@ export function TasksPage() {
 
   const [error, setError] = useState('');
 
+  const [creating, setCreating] = useState(false);
+
   const filterParam = searchParams.get('filter');
 
   const templateParam = searchParams.get('template');
@@ -441,7 +443,11 @@ export function TasksPage() {
 
     e.preventDefault();
 
+    if (creating) return;
+
     setError('');
+
+    setCreating(true);
 
     try {
 
@@ -492,6 +498,10 @@ export function TasksPage() {
     } catch (err) {
 
       setError(err instanceof Error ? err.message : 'Ошибка');
+
+    } finally {
+
+      setCreating(false);
 
     }
 
@@ -563,6 +573,8 @@ export function TasksPage() {
     showAssignee: isAdmin,
 
     error,
+
+    submitting: creating,
 
     onSubmit: handleCreate,
 

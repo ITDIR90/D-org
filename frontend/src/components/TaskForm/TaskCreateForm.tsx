@@ -37,6 +37,7 @@ interface TaskCreateFormProps {
   error?: string;
   submitLabel?: string;
   requesterMode?: boolean;
+  submitting?: boolean;
   onSubmit: (e: FormEvent) => void;
   onCancel?: () => void;
 }
@@ -61,6 +62,7 @@ export function TaskCreateForm({
   error,
   submitLabel,
   requesterMode = false,
+  submitting = false,
   onSubmit,
   onCancel,
 }: TaskCreateFormProps) {
@@ -77,7 +79,15 @@ export function TaskCreateForm({
   };
 
   return (
-    <form onSubmit={onSubmit}>
+    <form
+      onSubmit={(e) => {
+        if (submitting) {
+          e.preventDefault();
+          return;
+        }
+        onSubmit(e);
+      }}
+    >
       <div className="form-group">
         <label>{requesterMode ? 'Тема заявки' : 'Название'} *</label>
         <input
@@ -165,12 +175,14 @@ export function TaskCreateForm({
       {error && <p className="error-msg">{error}</p>}
       <div className={onCancel ? 'modal-actions' : 'actions'}>
         {onCancel && (
-          <button type="button" className="btn btn-secondary" onClick={onCancel}>
+          <button type="button" className="btn btn-secondary" onClick={onCancel} disabled={submitting}>
             Отмена
           </button>
         )}
-        <button type="submit" className="btn btn-primary">
-          {submitLabel ?? (requesterMode ? 'Отправить заявку' : 'Создать')}
+        <button type="submit" className="btn btn-primary" disabled={submitting}>
+          {submitting
+            ? 'Сохранение...'
+            : (submitLabel ?? (requesterMode ? 'Отправить заявку' : 'Создать'))}
         </button>
       </div>
     </form>
