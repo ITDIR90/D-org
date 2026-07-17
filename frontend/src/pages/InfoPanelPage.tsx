@@ -15,11 +15,11 @@ function formatDue(d: string) {
   });
 }
 
-function formatClock(date: Date) {
+function formatBarClock(date: Date) {
   return date.toLocaleString('ru-RU', {
-    weekday: 'long',
+    weekday: 'short',
     day: '2-digit',
-    month: 'long',
+    month: 'short',
     hour: '2-digit',
     minute: '2-digit',
   });
@@ -43,6 +43,7 @@ const COLUMNS: { id: ColumnId; title: string; match: (task: Task) => boolean }[]
 ];
 
 function InfoPanelCard({ task }: { task: Task }) {
+  const description = task.description?.trim();
   return (
     <article className={`infopanel-card infopanel-card--${task.priority}${task.is_overdue ? ' infopanel-card--overdue' : ''}`}>
       <div className="infopanel-card-top">
@@ -50,6 +51,11 @@ function InfoPanelCard({ task }: { task: Task }) {
         <PriorityBadge priority={task.priority} />
       </div>
       <p className="infopanel-card-title">{task.title}</p>
+      {description ? (
+        <p className="infopanel-card-description" title={description}>
+          {description}
+        </p>
+      ) : null}
       <div className="infopanel-card-meta">
         {task.assignee_name && <span>{task.assignee_name}</span>}
         {task.category_name && <span>{task.category_name}</span>}
@@ -115,33 +121,6 @@ export function InfoPanelPage() {
 
   return (
     <div className="infopanel-page">
-      <button type="button" className="infopanel-back-btn" onClick={goBack} title="Назад">
-        ← Назад
-      </button>
-      <header className="infopanel-header">
-        <div className="infopanel-brand">
-          <LogoMark size={44} variant="light" animated />
-          <div>
-            <LogoText variant="short" />
-            <p className="infopanel-subtitle">Задачи группы ИТ</p>
-          </div>
-        </div>
-        <div className="infopanel-clock">{formatClock(now)}</div>
-        <div className="infopanel-header-actions">
-          <button type="button" className="btn btn-secondary btn-sm" onClick={() => load()}>
-            Обновить
-          </button>
-        </div>
-      </header>
-
-      <section className="infopanel-stats">
-        <div className="infopanel-stat"><strong>{stats.total}</strong><span>активных</span></div>
-        <div className="infopanel-stat"><strong>{stats.new}</strong><span>новые</span></div>
-        <div className="infopanel-stat"><strong>{stats.inProgress}</strong><span>в работе</span></div>
-        <div className="infopanel-stat infopanel-stat--warn"><strong>{stats.overdue}</strong><span>просрочено</span></div>
-        <div className="infopanel-stat"><strong>{stats.waiting}</strong><span>на подтверждении</span></div>
-      </section>
-
       {loading ? (
         <p className="infopanel-loading">Загрузка задач...</p>
       ) : tasks.length === 0 ? (
@@ -166,9 +145,36 @@ export function InfoPanelPage() {
         </section>
       )}
 
-      <footer className="infopanel-footer">
-        Автообновление каждые {REFRESH_MS / 1000} сек
-        {updatedAt && ` · обновлено ${updatedAt.toLocaleTimeString('ru-RU')}`}
+      <footer className="infopanel-bar">
+        <button type="button" className="infopanel-bar-btn" onClick={goBack} title="Назад">
+          ← Назад
+        </button>
+        <div className="infopanel-bar-brand">
+          <LogoMark size={28} variant="light" animated />
+          <LogoText variant="short" />
+          <span className="infopanel-bar-subtitle">Задачи группы ИТ</span>
+        </div>
+        <div className="infopanel-bar-stats" aria-label="Сводка">
+          <span><strong>{stats.total}</strong> активных</span>
+          <span className="infopanel-bar-stat-sep" aria-hidden>·</span>
+          <span><strong>{stats.new}</strong> новые</span>
+          <span className="infopanel-bar-stat-sep" aria-hidden>·</span>
+          <span><strong>{stats.inProgress}</strong> в работе</span>
+          <span className="infopanel-bar-stat-sep" aria-hidden>·</span>
+          <span className="infopanel-bar-stat--warn"><strong>{stats.overdue}</strong> просрочено</span>
+          <span className="infopanel-bar-stat-sep" aria-hidden>·</span>
+          <span><strong>{stats.waiting}</strong> на подтверждении</span>
+        </div>
+        <time className="infopanel-bar-clock" dateTime={now.toISOString()}>
+          {formatBarClock(now)}
+        </time>
+        <button type="button" className="btn btn-secondary btn-sm infopanel-bar-refresh" onClick={() => load()}>
+          Обновить
+        </button>
+        <p className="infopanel-bar-meta">
+          Автообновление {REFRESH_MS / 1000} с
+          {updatedAt && ` · ${updatedAt.toLocaleTimeString('ru-RU')}`}
+        </p>
       </footer>
     </div>
   );
