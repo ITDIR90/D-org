@@ -30,10 +30,10 @@ export default function App() {
           <Route path="/infopanel" element={<InfoPanelPage />} />
           <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
             <Route path="/" element={<DashboardPage />} />
-            <Route path="/tasks/my" element={<TasksPage />} />
-            <Route path="/tasks/group" element={<TasksPage />} />
-            <Route path="/tasks/new" element={<TasksPage />} />
-            <Route path="/tasks/archive" element={<TasksPage />} />
+            <Route path="/tasks/my" element={<TasksPage key="tasks-my" />} />
+            <Route path="/tasks/group" element={<TasksPage key="tasks-group" />} />
+            <Route path="/tasks/new" element={<TasksPage key="tasks-new" />} />
+            <Route path="/tasks/archive" element={<TasksPage key="tasks-archive" />} />
             <Route path="/tasks/templates" element={<RequestTemplatesPage />} />
             <Route path="/tasks/:id" element={<TaskDetailPage />} />
             <Route path="/projects" element={<ProjectsPage />} />

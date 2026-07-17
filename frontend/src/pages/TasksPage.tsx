@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
 import { listTasks, createTask } from '../api/tasks';
 
@@ -176,11 +176,13 @@ export function TasksPage() {
 
   const navigate = useNavigate();
 
+  const location = useLocation();
+
   const requester = isRequestOnly(user?.role);
 
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const mode = window.location.pathname.split('/').pop() || 'my';
+  const mode = location.pathname.split('/').pop() || 'my';
 
   const [tasks, setTasks] = useState<Task[]>([]);
 
@@ -227,6 +229,15 @@ export function TasksPage() {
   const emptyLabel = requester ? 'Нет заявок в этой категории' : 'Нет задач в этой категории';
 
 
+
+  useEffect(() => {
+    // При смене маршрута (/tasks/new → /tasks/my) компонент может не размонтироваться —
+    // сбрасываем экран создания, иначе форма «залипает» у части пользователей.
+    setShowCreate(mode === 'new');
+    if (mode !== 'new') {
+      setError('');
+    }
+  }, [mode]);
 
   useEffect(() => {
 
@@ -481,19 +492,17 @@ export function TasksPage() {
 
       resetForm();
 
-      if (mode === 'new') {
-
-        navigate('/tasks/my');
-
-        return;
-
-      }
-
       setShowCreate(false);
 
-      load();
-
       notifyTasksChanged();
+
+      // /tasks/new и /tasks/my делят TasksPage — без ухода с маршрута форма остаётся открытой
+      if (mode === 'new') {
+        navigate('/tasks/my', { replace: true });
+        return;
+      }
+
+      load();
 
     } catch (err) {
 
@@ -517,7 +526,7 @@ export function TasksPage() {
     resetForm();
     setError('');
     if (mode === 'new') {
-      navigate('/tasks/my');
+      navigate('/tasks/my', { replace: true });
     }
   };
 
