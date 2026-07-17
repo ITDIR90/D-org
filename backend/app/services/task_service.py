@@ -25,7 +25,7 @@ from app.schemas.task import TaskCreate, TaskRead, TaskUpdate
 from app.services.ai_service import ModerationError, process_fields
 from app.services.audit_service import log_field_changes, log_task_change, log_user_action
 from app.services.duplicate_message_service import DuplicateTaskError, assert_task_not_duplicate
-from app.services.notification_service import create_notification, notify_group_members_new_task
+from app.services.notification_service import create_notification, format_task_description_block, notify_group_members_new_task
 
 
 def enrich_task(task: Task) -> TaskRead:
@@ -285,7 +285,7 @@ async def update_task(
             await create_notification(
                 db, assignee.id, NotificationType.ASSIGNED,
                 "Назначение ответственным",
-                f"Вам назначена задача: {task.title}",
+                f"Вам назначена задача: {task.title}{format_task_description_block(task.description)}",
                 EntityType.TASK, task.id, assignee,
             )
     if "due_at" in update_data and update_data["due_at"] != old_due and task.assignee_id:

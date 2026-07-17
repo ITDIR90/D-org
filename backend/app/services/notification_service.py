@@ -11,6 +11,23 @@ from app.services.notification_delivery import deliver_notification
 
 logger = logging.getLogger(__name__)
 
+# Telegram/MAX: запас относительно лимита ~4096 символов на сообщение целиком
+_MAX_DESCRIPTION_CHARS = 2500
+
+
+def format_task_description_block(description: str | None) -> str:
+    text = (description or "").strip()
+    if not text:
+        return ""
+    if len(text) > _MAX_DESCRIPTION_CHARS:
+        text = text[: _MAX_DESCRIPTION_CHARS - 1].rstrip() + "…"
+    return f"\n\nОписание:\n{text}"
+
+
+def format_new_task_message(task: Task) -> str:
+    base = f"Появилась новая задача №{task.number}: «{task.title}»"
+    return base + format_task_description_block(task.description)
+
 
 async def create_notification(
     db: AsyncSession,
@@ -72,7 +89,7 @@ async def notify_group_members_new_task(
 
     await db.refresh(task)
     title = "Новая задача в группе"
-    message = f"Появилась новая задача №{task.number}: «{task.title}»"
+    message = format_new_task_message(task)
 
     for member in members:
         if member.id in exclude:
