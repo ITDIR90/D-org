@@ -1,8 +1,14 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { listInfopanelTasks, type Task } from '../api/tasks';
 import { PriorityBadge } from '../components/PriorityBadge/PriorityBadge';
 import { LogoMark, LogoText } from '../components/Logo/Logo';
+import {
+  isInfopanelSoundEnabled,
+  playInfopanelNewTaskSound,
+  setInfopanelSoundEnabled,
+  unlockInfopanelAudio,
+} from '../utils/infopanelSound';
 
 const REFRESH_MS = 30_000;
 
@@ -72,6 +78,8 @@ export function InfoPanelPage() {
   const [loading, setLoading] = useState(true);
   const [now, setNow] = useState(() => new Date());
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
+  const [soundOn, setSoundOn] = useState(() => isInfopanelSoundEnabled());
+  const knownTaskIdsRef = useRef<Set<number> | null>(null);
 
   const goBack = () => {
     if (window.history.length > 1) {
@@ -84,6 +92,13 @@ export function InfoPanelPage() {
   const load = useCallback(async () => {
     try {
       const data = await listInfopanelTasks();
+      const nextIds = new Set(data.map((t) => t.id));
+      const prev = knownTaskIdsRef.current;
+      if (prev !== null) {
+        const hasNew = data.some((t) => !prev.has(t.id));
+        if (hasNew) playInfopanelNewTaskSound();
+      }
+      knownTaskIdsRef.current = nextIds;
       setTasks(data);
       setUpdatedAt(new Date());
     } catch {
@@ -91,6 +106,20 @@ export function InfoPanelPage() {
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  const toggleSound = () => {
+    unlockInfopanelAudio();
+    const next = !soundOn;
+    setSoundOn(next);
+    setInfopanelSoundEnabled(next);
+    if (next) playInfopanelNewTaskSound();
+  };
+
+  useEffect(() => {
+    const unlock = () => unlockInfopanelAudio();
+    document.addEventListener('pointerdown', unlock, { once: true });
+    return () => document.removeEventListener('pointerdown', unlock);
   }, []);
 
   useEffect(() => {
@@ -170,6 +199,15 @@ export function InfoPanelPage() {
         </time>
         <button type="button" className="btn btn-secondary btn-sm infopanel-bar-refresh" onClick={() => load()}>
           Обновить
+        </button>
+        <button
+          type="button"
+          className={`infopanel-bar-sound${soundOn ? ' infopanel-bar-sound--on' : ''}`}
+          onClick={toggleSound}
+          title={soundOn ? 'Звук при новой задаче включён' : 'Звук при новой задаче выключен'}
+          aria-pressed={soundOn}
+        >
+          {soundOn ? '🔊' : '🔇'}
         </button>
         <p className="infopanel-bar-meta">
           Автообновление {REFRESH_MS / 1000} с
