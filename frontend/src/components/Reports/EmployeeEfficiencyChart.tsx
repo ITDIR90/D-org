@@ -73,7 +73,7 @@ function PerformanceMatrix({ rows }: { rows: EmployeeEfficiencyRow[] }) {
           <line x1={pad.left} y1={midY} x2={pad.left + innerW} y2={midY} className="eff-matrix-grid" strokeDasharray="4 4" />
 
           <text x={pad.left + innerW * 0.75} y={pad.top + 16} className="eff-matrix-label eff-matrix-label--q">Звёзды</text>
-          <text x={pad.left + 8} y={pad.top + 16} className="eff-matrix-label">Надёжные</text>
+          <text x={pad.left + 8} y={pad.top + 16} className="eff-matrix-label eff-matrix-label--muted">Надёжные</text>
           <text x={pad.left + innerW * 0.75} y={pad.top + innerH - 8} className="eff-matrix-label eff-matrix-label--warn">Много задач</text>
           <text x={pad.left + 8} y={pad.top + innerH - 8} className="eff-matrix-label eff-matrix-label--warn">Нужно внимание</text>
 
@@ -105,7 +105,8 @@ function PerformanceMatrix({ rows }: { rows: EmployeeEfficiencyRow[] }) {
                 r={7 + Math.min(row.completed_count, 12) * 0.4}
                 fill={onTimeBarBg(row.on_time_percent)}
                 fillOpacity={0.85}
-                stroke="var(--color-surface)"
+                stroke="var(--color-text-secondary)"
+                strokeOpacity={0.35}
                 strokeWidth={2}
               />
               <title>
@@ -243,7 +244,7 @@ export function EmployeeEfficiencyChart({ rows, periodDays }: Props) {
           rows={rows.filter((r) => r.avg_completion_hours != null)}
           valueKey="avg_completion_hours"
           formatValue={(v) => formatHours(v)}
-          colorForRow={() => 'var(--color-steel)'}
+          colorForRow={() => 'var(--color-steel-light)'}
         />
         <HorizontalBars
           title="Дисциплина сроков"
@@ -256,9 +257,9 @@ export function EmployeeEfficiencyChart({ rows, periodDays }: Props) {
       </div>
 
       <div className="eff-legend-strip">
-        <span><i className="eff-legend-swatch" style={{ background: 'var(--color-success)' }} /> ≥85% в срок</span>
+        <span><i className="eff-legend-swatch" style={{ background: 'var(--color-success-text)' }} /> ≥85% в срок</span>
         <span><i className="eff-legend-swatch" style={{ background: 'var(--color-warning)' }} /> 60–84%</span>
-        <span><i className="eff-legend-swatch" style={{ background: 'var(--color-danger)' }} /> &lt;60%</span>
+        <span><i className="eff-legend-swatch" style={{ background: 'var(--color-danger-text)' }} /> &lt;60%</span>
       </div>
     </div>
   );
