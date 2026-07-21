@@ -10,6 +10,7 @@ from app.api.v1.endpoints import (
     notifications,
     projects,
     recurring_tasks,
+    reports,
     request_templates,
     settings,
     tasks,
@@ -26,6 +27,7 @@ api_router.include_router(integrations.router)
 api_router.include_router(projects.router)
 api_router.include_router(recurring_tasks.router)
 api_router.include_router(request_templates.router)
+api_router.include_router(reports.router)
 api_router.include_router(notifications.router)
 api_router.include_router(chats.router)
 api_router.include_router(logs.router)

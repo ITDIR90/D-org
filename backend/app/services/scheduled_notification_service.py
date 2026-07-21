@@ -9,6 +9,7 @@ from app.core.enums import EntityType, NotificationType, TaskStatus
 from app.db.session import async_session
 from app.models.task import Task
 from app.models.user import User
+from app.services.business_days import is_non_working_day
 from app.services.notification_service import create_notification
 
 ACTIVE_STATUSES = (
@@ -105,6 +106,8 @@ async def process_overdue_digests() -> None:
             except Exception:
                 tz = ZoneInfo("Europe/Moscow")
             local_now = datetime.now(tz)
+            if is_non_working_day(local_now.date()):
+                continue
             if local_now.hour != 16 or local_now.minute != 0:
                 continue
             today = local_now.date()
