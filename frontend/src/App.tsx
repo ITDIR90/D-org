@@ -19,6 +19,7 @@ import { DirectChatPage } from './pages/DirectChatPage';
 import { LogsPage } from './pages/LogsPage';
 import { SystemSettingsPage } from './pages/SystemSettingsPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { InfoPanelPage } from './pages/InfoPanelPage';
 import { EmployeeEfficiencyPage } from './pages/EmployeeEfficiencyPage';
 
 export default function App() {
