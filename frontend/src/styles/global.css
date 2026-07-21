@@ -534,6 +534,36 @@ a:hover { color: var(--color-steel-light); text-decoration: none; }
   letter-spacing: -0.01em;
 }
 
+.page-hint {
+  margin: -1rem 0 1.25rem;
+  color: var(--color-text-muted);
+  font-size: 0.92rem;
+}
+
+.report-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.report-filters label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+}
+
+.report-filters select {
+  min-width: 10rem;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
 .card {
   background: var(--color-surface);
   border-radius: var(--radius-lg);

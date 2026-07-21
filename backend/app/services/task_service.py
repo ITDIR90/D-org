@@ -24,6 +24,7 @@ from app.models.user import User
 from app.schemas.task import TaskCreate, TaskRead, TaskUpdate
 from app.services.ai_service import ModerationError, process_fields
 from app.services.audit_service import log_field_changes, log_task_change, log_user_action
+from app.services.business_days import compute_default_due_at
 from app.services.duplicate_message_service import DuplicateTaskError, assert_task_not_duplicate
 from app.services.notification_service import create_notification, format_task_description_block, notify_group_members_new_task
 
@@ -181,9 +182,9 @@ async def create_task(
     if data.due_at:
         due_at = data.due_at
     elif category.default_due_days:
-        due_at = now + timedelta(days=category.default_due_days)
+        due_at = compute_default_due_at(now, category.default_due_days)
     else:
-        due_at = now + timedelta(days=2)
+        due_at = compute_default_due_at(now, 2)
 
     if data.assignee_id:
         if user.role != UserRole.SUPERADMIN and not await is_group_admin(db, user, data.target_group_id):

@@ -11,6 +11,7 @@ from app.models.category import Category
 from app.models.task import Task
 from app.models.user import User
 from app.schemas.integration import IntegrationRequestCreate, IntegrationRequestRead
+from app.services.business_days import compute_default_due_at
 
 EXTERNAL_SOURCE = "onec"
 
@@ -88,9 +89,9 @@ async def create_integration_request(
     if data.due_at:
         due_at = data.due_at
     elif category.default_due_days:
-        due_at = now + timedelta(days=category.default_due_days)
+        due_at = compute_default_due_at(now, category.default_due_days)
     else:
-        due_at = now + timedelta(days=2)
+        due_at = compute_default_due_at(now, 2)
 
     member_groups = await get_user_member_group_ids(db, user.id)
     author_group_id = data.target_group_id

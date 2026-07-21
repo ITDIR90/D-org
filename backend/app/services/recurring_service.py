@@ -8,6 +8,7 @@ from app.core.enums import ScheduleType, TaskStatus
 from app.db.session import async_session
 from app.models.recurring_task import RecurringTaskTemplate
 from app.models.task import Task
+from app.services.business_days import compute_default_due_at
 from app.services.notification_service import notify_group_members_new_task
 
 
@@ -29,7 +30,7 @@ async def create_task_from_template(db: AsyncSession, template: RecurringTaskTem
     if not template.is_active:
         return None
     now = datetime.now(timezone.utc)
-    due_at = now + timedelta(days=template.due_days or 2)
+    due_at = compute_default_due_at(now, template.due_days or 2)
     task = Task(
         title=template.title,
         description=template.description,

@@ -18,6 +18,7 @@ const NAV = [
   { path: '/users', label: 'Пользователи', icon: '👤', roles: ['superadmin', 'group_admin'] },
   { path: '/groups', label: 'Группы', icon: '⬡', roles: ['superadmin'] },
   { path: '/categories', label: 'Категории', icon: '▦', roles: ['superadmin', 'group_admin'] },
+  { path: '/reports/efficiency', label: 'Эффективность', icon: '📊', roles: ['superadmin', 'group_admin'] },
   { path: '/logs', label: 'Журнал действий', icon: '📋', roles: ['superadmin'] },
   { path: '/settings', label: 'Настройки системы', icon: '⚙', roles: ['superadmin'] },
 ];

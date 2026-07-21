@@ -19,7 +19,7 @@ import { DirectChatPage } from './pages/DirectChatPage';
 import { LogsPage } from './pages/LogsPage';
 import { SystemSettingsPage } from './pages/SystemSettingsPage';
 import { ProfilePage } from './pages/ProfilePage';
-import { InfoPanelPage } from './pages/InfoPanelPage';
+import { EmployeeEfficiencyPage } from './pages/EmployeeEfficiencyPage';
 
 export default function App() {
   return (
@@ -46,6 +46,7 @@ export default function App() {
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/chats/group" element={<GroupChatPage />} />
             <Route path="/chats/direct" element={<DirectChatPage />} />
+            <Route path="/reports/efficiency" element={<EmployeeEfficiencyPage />} />
             <Route path="/logs" element={<LogsPage />} />
             <Route path="/settings" element={<SystemSettingsPage />} />
           </Route>
