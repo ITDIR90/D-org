@@ -3,8 +3,10 @@ import { Navigate } from 'react-router-dom';
 import { getEmployeeEfficiencyReport, type EmployeeEfficiencyRow } from '../api/reports';
 import { listGroups } from '../api/groups';
 import { useAuth } from '../auth/AuthContext';
+import { EmployeeEfficiencyChart } from '../components/Reports/EmployeeEfficiencyChart';
 import { SortableTh } from '../components/Table/SortableTh';
 import { useTableSort } from '../hooks/useTableSort';
+import { formatHours } from '../utils/formatDuration';
 
 const PERIOD_OPTIONS = [
   { value: 7, label: '7 дней' },
@@ -13,12 +15,7 @@ const PERIOD_OPTIONS = [
   { value: 180, label: '180 дней' },
 ];
 
-function formatHours(hours: number | null): string {
-  if (hours == null) return '—';
-  if (hours < 1) return `${Math.round(hours * 60)} мин`;
-  if (hours < 24) return `${hours.toFixed(1)} ч`;
-  return `${(hours / 24).toFixed(1)} дн.`;
-}
+type ViewMode = 'table' | 'chart';
 
 const SORT_ACCESSORS = {
   full_name: (r: EmployeeEfficiencyRow) => r.full_name,
@@ -36,6 +33,7 @@ export function EmployeeEfficiencyPage() {
   const [groups, setGroups] = useState<{ id: number; name: string }[]>([]);
   const [rows, setRows] = useState<EmployeeEfficiencyRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [view, setView] = useState<ViewMode>('chart');
 
   useEffect(() => {
     listGroups().then(setGroups).catch(() => {});
@@ -64,9 +62,29 @@ export function EmployeeEfficiencyPage() {
     <div>
       <div className="page-header">
         <h1>Эффективность сотрудников</h1>
+        <div className="view-toggle" role="tablist" aria-label="Вид отчёта">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={view === 'chart'}
+            className={view === 'chart' ? 'active' : ''}
+            onClick={() => setView('chart')}
+          >
+            График
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={view === 'table'}
+            className={view === 'table' ? 'active' : ''}
+            onClick={() => setView('table')}
+          >
+            Таблица
+          </button>
+        </div>
       </div>
       <p className="page-hint">
-        Статистика по выполненным задачам: сколько закрыто и как быстро (от создания до завершения).
+        Статистика по выполненным задачам: объём, скорость и соблюдение сроков.
       </p>
 
       <div className="report-filters">
@@ -93,8 +111,10 @@ export function EmployeeEfficiencyPage() {
 
       {loading ? (
         <p className="empty">Загрузка отчёта...</p>
-      ) : sorted.length === 0 ? (
+      ) : rows.length === 0 ? (
         <p className="empty">Нет выполненных задач за выбранный период</p>
+      ) : view === 'chart' ? (
+        <EmployeeEfficiencyChart rows={rows} periodDays={periodDays} />
       ) : (
         <div className="table-wrap">
           <table className="data-table">
