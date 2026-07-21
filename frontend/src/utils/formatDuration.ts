@@ -13,10 +13,10 @@ export function onTimeColor(percent: number | null): string {
 }
 
 export function onTimeBarBg(percent: number | null): string {
-  if (percent == null) return 'var(--color-grey-light)';
-  if (percent >= 85) return 'var(--color-success)';
+  if (percent == null) return 'var(--color-steel-light)';
+  if (percent >= 85) return 'var(--color-success-text)';
   if (percent >= 60) return 'var(--color-warning)';
-  return 'var(--color-danger)';
+  return 'var(--color-danger-text)';
 }
 
 export function shortName(fullName: string, max = 22): string {

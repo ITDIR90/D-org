@@ -15,6 +15,7 @@
   --color-text: #0D1F3D;
   --color-text-secondary: #3B6A99;
   --color-muted: #8A97A6;
+  --color-text-muted: #8A97A6;
   --color-border: #E2E8EF;
   --color-border-light: #EEF2F6;
 
@@ -552,7 +553,7 @@ a:hover { color: var(--color-steel-light); text-decoration: none; }
   flex-direction: column;
   gap: 0.35rem;
   font-size: 0.82rem;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
 }
 
 .report-filters select {
@@ -580,14 +581,14 @@ a:hover { color: var(--color-steel-light); text-decoration: none; }
   border: none;
   border-radius: calc(var(--radius) - 2px);
   background: transparent;
-  color: var(--color-muted);
+  color: var(--color-text-secondary);
   cursor: pointer;
   transition: background 0.15s, color 0.15s, box-shadow 0.15s;
 }
 
 .view-toggle button.active {
   background: var(--color-surface);
-  color: var(--color-navy);
+  color: var(--color-text);
   box-shadow: var(--shadow-sm);
 }
 
@@ -634,7 +635,7 @@ a:hover { color: var(--color-steel-light); text-decoration: none; }
 .eff-kpi-label {
   display: block;
   font-size: 0.75rem;
-  color: var(--color-muted);
+  color: var(--color-text-secondary);
   margin-bottom: 0.35rem;
 }
 
@@ -644,7 +645,7 @@ a:hover { color: var(--color-steel-light); text-decoration: none; }
   font-weight: 700;
   line-height: 1.15;
   letter-spacing: -0.02em;
-  color: var(--color-navy);
+  color: var(--color-text);
 }
 
 .eff-kpi-value--name {
@@ -655,7 +656,12 @@ a:hover { color: var(--color-steel-light); text-decoration: none; }
   display: block;
   margin-top: 0.35rem;
   font-size: 0.72rem;
-  color: var(--color-muted);
+  color: var(--color-text-secondary);
+}
+
+.eff-chart-card-head p {
+  font-size: 0.78rem;
+  color: var(--color-text-secondary);
 }
 
 .eff-charts-grid {
@@ -679,13 +685,8 @@ a:hover { color: var(--color-steel-light); text-decoration: none; }
 .eff-chart-card-head h3 {
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--color-navy);
+  color: var(--color-text);
   margin-bottom: 0.2rem;
-}
-
-.eff-chart-card-head p {
-  font-size: 0.78rem;
-  color: var(--color-muted);
 }
 
 .eff-matrix-wrap {
@@ -698,6 +699,7 @@ a:hover { color: var(--color-steel-light); text-decoration: none; }
   width: 100%;
   height: auto;
   display: block;
+  color: var(--color-text-secondary);
 }
 
 .eff-matrix-bg {
@@ -709,29 +711,37 @@ a:hover { color: var(--color-steel-light); text-decoration: none; }
   stroke-width: 1;
 }
 
+.eff-matrix-label,
+.eff-matrix-axis,
+.eff-matrix-axis-title {
+  fill: currentColor;
+}
+
 .eff-matrix-label {
   font-size: 9px;
-  fill: var(--color-muted);
   font-weight: 600;
 }
 
 .eff-matrix-label--q {
-  fill: var(--color-success-text);
+  color: var(--color-success-text);
+}
+
+.eff-matrix-label--muted {
+  color: var(--color-steel-light);
 }
 
 .eff-matrix-label--warn {
-  fill: var(--color-warning);
+  color: var(--color-warning);
 }
 
 .eff-matrix-axis {
   font-size: 9px;
-  fill: var(--color-muted);
 }
 
 .eff-matrix-axis-title {
   font-size: 10px;
-  fill: var(--color-text-secondary);
   font-weight: 500;
+  color: var(--color-text-secondary);
 }
 
 .eff-matrix-tick {
@@ -827,7 +837,7 @@ a:hover { color: var(--color-steel-light); text-decoration: none; }
   flex-wrap: wrap;
   gap: 1rem 1.5rem;
   font-size: 0.78rem;
-  color: var(--color-muted);
+  color: var(--color-text-secondary);
   padding: 0.5rem 0.25rem;
 }
 
