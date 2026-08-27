@@ -450,7 +450,7 @@ a:hover { color: var(--color-steel-light); text-decoration: none; }
   color: rgba(255,255,255,0.9);
 }
 
-.body-wrap { display: flex; flex: 1; }
+.body-wrap { display: flex; flex: 1; position: relative; }
 
 /* ── Sidebar ── */
 .sidebar {
@@ -517,6 +517,7 @@ a:hover { color: var(--color-steel-light); text-decoration: none; }
   padding: 1.75rem 2rem;
   overflow-x: auto;
   min-width: 0;
+  position: relative;
 }
 
 /* ── Page ── */
