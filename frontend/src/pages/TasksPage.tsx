@@ -40,6 +40,8 @@ import {
 
   REQUESTER_TASK_FILTERS,
 
+  GROUP_TASK_FILTERS,
+
   applyMyTaskFilter,
 
   applyRequesterTaskFilter,
@@ -82,19 +84,7 @@ const REQUESTER_TITLES: Record<string, string> = {
 
 
 
-const GROUP_FILTERS: { id: GroupTaskFilter; label: string }[] = [
-
-  { id: 'all', label: 'Все' },
-
-  { id: 'unassigned', label: 'Новые' },
-
-  { id: 'done', label: 'Выполненные' },
-
-];
-
-
-
-const VALID_GROUP_FILTERS = new Set<GroupTaskFilter>(GROUP_FILTERS.map((f) => f.id));
+const VALID_GROUP_FILTERS = new Set<GroupTaskFilter>(GROUP_TASK_FILTERS.map((f) => f.id));
 
 
 
@@ -140,7 +130,7 @@ function parseGroupFilter(value: string | null): GroupTaskFilter {
 
   }
 
-  return 'all';
+  return 'in_progress';
 
 }
 
@@ -281,7 +271,7 @@ export function TasksPage() {
 
     if (mode === 'group') {
 
-      return applyGroupTaskFilter(tasks, groupFilter);
+      return applyGroupTaskFilter(tasks, createdTasks, groupFilter);
 
     }
 
@@ -341,10 +331,6 @@ export function TasksPage() {
 
       filters.my_group = true;
 
-      if (groupFilter === 'unassigned') filters.status = 'new';
-
-      else if (groupFilter === 'done') filters.status = 'done';
-
     }
 
     if (mode === 'archive') {
@@ -353,7 +339,17 @@ export function TasksPage() {
 
     }
 
-    listTasks(filters).then(setTasks).catch(() => {}).finally(() => setLoading(false));
+    listTasks(filters)
+      .then((allGroupTasks) => {
+        setTasks(allGroupTasks);
+        if (mode === 'group') {
+          listTasks({ created_by_me: true })
+            .then(setCreatedTasks)
+            .catch(() => {});
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
     notifyTasksChanged();
 
   };
@@ -424,7 +420,7 @@ export function TasksPage() {
 
     setGroupFilter(filter);
 
-    setSearchParams(filter === 'all' ? {} : { filter });
+    setSearchParams(filter === 'in_progress' ? {} : { filter });
 
   };
 
@@ -738,7 +734,7 @@ export function TasksPage() {
 
         <div className="quick-filters">
 
-          {GROUP_FILTERS.map((f) => (
+          {GROUP_TASK_FILTERS.map((f) => (
 
             <button
 

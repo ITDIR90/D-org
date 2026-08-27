@@ -193,7 +193,7 @@ export function TopbarKpis() {
         },
         {
           id: 'new',
-          to: '/tasks/group?filter=unassigned',
+          to: '/tasks/group?filter=in_progress',
           label: 'Новые',
           count: counts.newTasks,
           accent: 'new',

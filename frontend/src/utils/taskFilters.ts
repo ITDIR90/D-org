@@ -1,7 +1,7 @@
 import type { Task } from '../api/tasks';
 
 export type MyTaskFilter = 'in_progress' | 'urgent' | 'overdue' | 'done' | 'created_by_me' | 'all' | 'awaiting_confirmation';
-export type GroupTaskFilter = 'all' | 'unassigned' | 'done';
+export type GroupTaskFilter = 'in_progress' | 'urgent' | 'overdue' | 'done' | 'created_by_me' | 'all' | 'awaiting_confirmation';
 export type RequesterTaskFilter = 'active' | 'awaiting_confirmation' | 'overdue' | 'done' | 'cancelled' | 'all';
 
 export const MY_TASK_FILTERS: { id: MyTaskFilter; label: string }[] = [
@@ -133,15 +133,45 @@ export function countDoneRequesterTasks(tasks: Task[]) {
   return tasks.filter((t) => t.status === 'done').length;
 }
 
-export function applyGroupTaskFilter(tasks: Task[], filter: GroupTaskFilter): Task[] {
-  const sorted = sortByCreatedAt(tasks);
+export const GROUP_TASK_FILTERS: { id: GroupTaskFilter; label: string }[] = [
+  { id: 'in_progress', label: 'В работе' },
+  { id: 'urgent', label: 'Срочные' },
+  { id: 'overdue', label: 'Просроченные' },
+  { id: 'awaiting_confirmation', label: 'На подтверждении' },
+  { id: 'done', label: 'Выполненные' },
+  { id: 'created_by_me', label: 'Созданные мной' },
+  { id: 'all', label: 'Все задачи' },
+];
+
+export function applyGroupTaskFilter(
+  groupTasks: Task[],
+  createdTasks: Task[],
+  filter: GroupTaskFilter,
+): Task[] {
   switch (filter) {
-    case 'unassigned':
-      return sorted.filter((t) => t.status === 'new');
-    case 'done':
-      return sorted.filter((t) => t.status === 'done');
+    case 'created_by_me':
+      return sortByCreatedAt(createdTasks.filter((t) => t.status !== 'archived'));
     case 'all':
+      return sortByCreatedAt(groupTasks);
+    case 'in_progress':
+      return sortByCreatedAt(groupTasks.filter(isInProgressTask));
+    case 'urgent':
+      return sortByCreatedAt(groupTasks.filter(isUrgentTask));
+    case 'overdue':
+      return sortByCreatedAt(groupTasks.filter(isOverdueTask));
+    case 'awaiting_confirmation': {
+      const seen = new Set<number>();
+      return sortByCreatedAt(
+        [...groupTasks, ...createdTasks].filter((t) => {
+          if (!isAwaitingConfirmationTask(t) || seen.has(t.id)) return false;
+          seen.add(t.id);
+          return true;
+        }),
+      );
+    }
+    case 'done':
+      return sortByCreatedAt(groupTasks.filter((t) => t.status === 'done'));
     default:
-      return sorted.filter((t) => t.status !== 'done');
+      return sortByCreatedAt(groupTasks);
   }
 }

@@ -150,7 +150,7 @@ export function DashboardPage() {
           <h2><span className="stat-dot stat-dot--waiting" /> Новые ({newTasks.length})</h2>
           <TaskCompactList tasks={newTasks.slice(0, 6)} showAuthor />
           {newTasks.length > 0 && (
-            <Link to="/tasks/group?filter=unassigned" className="card-link">Показать все →</Link>
+            <Link to="/tasks/group?filter=in_progress" className="card-link">Показать все →</Link>
           )}
         </div>
         <div className="card dashboard-card">
