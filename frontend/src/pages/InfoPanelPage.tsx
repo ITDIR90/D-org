@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { listInfopanelTasks, type Task } from '../api/tasks';
 import { PriorityBadge } from '../components/PriorityBadge/PriorityBadge';
 import { LogoMark, LogoText } from '../components/Logo/Logo';
+import { InfopanelRain } from '../components/Infopanel/InfopanelRain';
 import {
   isInfopanelSoundEnabled,
   playInfopanelNewTaskSound,
@@ -150,6 +151,7 @@ export function InfoPanelPage() {
 
   return (
     <div className="infopanel-page">
+      <InfopanelRain />
       {loading ? (
         <p className="infopanel-loading">Загрузка задач...</p>
       ) : tasks.length === 0 ? (

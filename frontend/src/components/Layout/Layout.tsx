@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { listNotifications } from '../../api/chats';
 import { LogoMark, LogoText } from '../Logo/Logo';
 import { TopbarKpis } from './TopbarKpis';
-import { MatrixRain } from '../Effects/MatrixRain';
 import { isRequestOnly } from '../../constants/roles';
 
 const NAV = [
@@ -78,7 +77,6 @@ export function Layout() {
         </div>
       </header>
       <div className="body-wrap">
-        <MatrixRain />
         <aside className={`sidebar ${menuOpen ? 'open' : ''}`}>
           <div className="sidebar-logo">
             <LogoMark size={44} variant="light" animated />
