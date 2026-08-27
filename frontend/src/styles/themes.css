@@ -378,6 +378,10 @@
   background: linear-gradient(135deg, #07060f 40%, #00d4ff 40%, #00d4ff 60%, #00ff9d 60%);
   box-shadow: 0 0 12px rgba(0, 255, 157, 0.35);
 }
+.theme-option[data-theme-preview='matrix'] .theme-option__swatch {
+  background: linear-gradient(135deg, #020603 40%, #00ff41 40%, #00ff41 60%, #0a3d12 60%);
+  box-shadow: 0 0 12px rgba(0, 255, 65, 0.3);
+}
 .theme-option__text {
   display: flex;
   flex-direction: column;
@@ -398,4 +402,211 @@
 [data-theme='neon'] .theme-option--active {
   border-color: var(--color-accent);
   box-shadow: 0 0 0 3px rgba(0, 255, 157, 0.15), 0 0 16px rgba(0, 255, 157, 0.1);
+}
+
+/* ══ MATRIX THEME ══ */
+[data-theme='matrix'] {
+  color-scheme: dark;
+  --color-steel: #00ff41;
+  --color-steel-light: #5eff8a;
+  --color-accent: #00ff41;
+  --color-accent-dark: #00cc34;
+  --color-grey: #2e8b57;
+  --color-grey-light: #4fbf7f;
+
+  --color-bg: #020603;
+  --color-surface: #061209;
+  --color-text: #c9f5d3;
+  --color-text-secondary: #6ee68f;
+  --color-muted: #3f7a55;
+  --color-text-muted: #5fb878;
+  --color-border: #12401f;
+  --color-border-light: #0b2a14;
+
+  --color-danger: #ff5252;
+  --color-danger-soft: rgba(255, 82, 82, 0.12);
+  --color-danger-text: #ff8a8a;
+  --color-warning: #ffd24d;
+  --color-warning-soft: rgba(255, 210, 77, 0.12);
+  --color-success: #00ff41;
+  --color-success-soft: rgba(0, 255, 65, 0.1);
+  --color-success-text: #5dff8a;
+  --color-ferrari: #ff4757;
+  --color-ferrari-soft: rgba(255, 71, 87, 0.12);
+  --color-ferrari-text: #ff7a86;
+
+  --shadow-sm: 0 0 12px rgba(0, 255, 65, 0.06);
+  --shadow: 0 0 20px rgba(0, 255, 65, 0.09);
+  --shadow-md: 0 0 28px rgba(0, 255, 65, 0.1);
+  --shadow-lg: 0 0 40px rgba(0, 255, 65, 0.12);
+
+  --topbar-bg: linear-gradient(90deg, #020603 0%, #062610 50%, #020603 100%);
+  --sidebar-bg: #020603;
+  --login-page-bg: radial-gradient(circle at 20% 20%, rgba(0, 255, 65, 0.1), transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(0, 255, 65, 0.07), transparent 35%),
+    linear-gradient(160deg, #020603 0%, #041a09 50%, #020603 100%);
+  --input-bg: #041208;
+  --card-glow: 0 0 22px rgba(0, 255, 65, 0.07);
+}
+
+/* Матричный цифровой дождь — ненавязчивый фон */
+[data-theme='matrix'] body {
+  background:
+    radial-gradient(ellipse at 50% -10%, rgba(0, 255, 65, 0.08), transparent 55%),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 66px,
+      rgba(0, 255, 65, 0.035) 66px,
+      rgba(0, 255, 65, 0.035) 67px
+    ),
+    linear-gradient(160deg, #020603 0%, #031007 50%, #020603 100%);
+  background-size: 100% 100%, 67px 67px, 100% 100%;
+}
+
+[data-theme='matrix'] .logo-text__primary { color: #c9f5d3; }
+[data-theme='matrix'] .logo-text__secondary { color: #00ff41; }
+[data-theme='matrix'] .card,
+[data-theme='matrix'] .modal {
+  background: rgba(6, 18, 9, 0.85);
+  border-color: rgba(0, 255, 65, 0.18);
+  box-shadow: var(--card-glow);
+  backdrop-filter: blur(2px);
+}
+
+[data-theme='matrix'] .btn-primary {
+  background: linear-gradient(135deg, #00ff41, #00b32d);
+  color: #022406;
+  border: none;
+  box-shadow: 0 0 18px rgba(0, 255, 65, 0.35);
+}
+[data-theme='matrix'] .btn-primary:hover {
+  filter: brightness(1.08);
+  box-shadow: 0 0 26px rgba(0, 255, 65, 0.45);
+}
+
+[data-theme='matrix'] .sidebar-nav a.active {
+  background: rgba(0, 255, 65, 0.1);
+  border-left-color: var(--color-accent);
+  box-shadow: inset 0 0 20px rgba(0, 255, 65, 0.06);
+}
+
+[data-theme='matrix'] .form-group input,
+[data-theme='matrix'] .form-group select,
+[data-theme='matrix'] .form-group textarea,
+[data-theme='matrix'] input:not([type='checkbox']):not([type='radio']):not([type='button']):not([type='submit']):not([type='reset']),
+[data-theme='matrix'] select,
+[data-theme='matrix'] textarea,
+[data-theme='matrix'] .chat-input input {
+  background: var(--input-bg);
+  color: var(--color-text);
+  border-color: rgba(0, 255, 65, 0.25);
+}
+[data-theme='matrix'] input::placeholder,
+[data-theme='matrix'] textarea::placeholder {
+  color: var(--color-muted);
+}
+[data-theme='matrix'] .form-group input:focus,
+[data-theme='matrix'] .form-group select:focus,
+[data-theme='matrix'] .form-group textarea:focus,
+[data-theme='matrix'] input:not([type='checkbox']):not([type='radio']):not([type='button']):not([type='submit']):not([type='reset']):focus,
+[data-theme='matrix'] select:focus,
+[data-theme='matrix'] textarea:focus,
+[data-theme='matrix'] .chat-input input:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(0, 255, 65, 0.15), 0 0 16px rgba(0, 255, 65, 0.12);
+}
+[data-theme='matrix'] .form-group label,
+[data-theme='matrix'] .detail-item label {
+  color: var(--color-text-secondary);
+}
+[data-theme='matrix'] .role-badge--superadmin {
+  background: rgba(0, 255, 65, 0.12);
+  color: var(--color-steel);
+}
+[data-theme='matrix'] .data-table td {
+  color: var(--color-text);
+}
+
+[data-theme='matrix'] .view-toggle button.active {
+  background: var(--input-bg);
+  color: var(--color-text);
+  border: 1px solid rgba(0, 255, 65, 0.25);
+}
+
+[data-theme='matrix'] .eff-kpi--highlight {
+  background: linear-gradient(135deg, #041208 0%, #0a3d12 100%);
+  box-shadow: 0 0 20px rgba(0, 255, 65, 0.12);
+}
+
+[data-theme='matrix'] .eff-kpi-label,
+[data-theme='matrix'] .eff-kpi-hint,
+[data-theme='matrix'] .eff-chart-card-head p,
+[data-theme='matrix'] .eff-legend-strip,
+[data-theme='matrix'] .eff-matrix-legend-more {
+  color: var(--color-text-secondary);
+}
+
+[data-theme='matrix'] .eff-bar-track {
+  background: #0b2a14;
+}
+
+[data-theme='matrix'] .view-toggle button {
+  color: var(--color-text-secondary);
+}
+[data-theme='matrix'] .view-toggle button:hover:not(.active) {
+  color: var(--color-text);
+}
+
+[data-theme='matrix'] .eff-matrix {
+  color: var(--color-text-secondary);
+}
+[data-theme='matrix'] .eff-matrix-label--q {
+  color: var(--color-success-text);
+}
+[data-theme='matrix'] .eff-matrix-label--muted {
+  color: var(--color-steel-light);
+}
+[data-theme='matrix'] .eff-matrix-label--warn {
+  color: var(--color-warning);
+}
+[data-theme='matrix'] .eff-matrix-axis,
+[data-theme='matrix'] .eff-matrix-axis-title {
+  color: var(--color-text-secondary);
+}
+[data-theme='matrix'] .eff-matrix-bg {
+  fill: #04140a;
+}
+[data-theme='matrix'] .eff-matrix-grid,
+[data-theme='matrix'] .eff-matrix-tick {
+  stroke: #14552a;
+}
+
+[data-theme='matrix'] .data-table tbody tr:hover,
+[data-theme='matrix'] .data-table-row--clickable:hover {
+  background: rgba(0, 255, 65, 0.06);
+}
+[data-theme='matrix'] a { color: var(--color-steel); }
+[data-theme='matrix'] a:hover { color: var(--color-accent); }
+
+[data-theme='matrix'] .chat-msg-bubble--own {
+  background: linear-gradient(135deg, #00b32d, #00801f);
+  box-shadow: 0 0 16px rgba(0, 255, 65, 0.18);
+}
+[data-theme='matrix'] .chat-msg-time {
+  color: var(--color-text-secondary);
+}
+[data-theme='matrix'] .chat-composer__input:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(0, 255, 65, 0.12);
+}
+[data-theme='matrix'] .chat-thread-item--active {
+  background: rgba(0, 255, 65, 0.08);
+  border-color: rgba(0, 255, 65, 0.25);
+  box-shadow: 0 0 12px rgba(0, 255, 65, 0.08);
+}
+
+[data-theme='matrix'] .theme-option--active {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(0, 255, 65, 0.15), 0 0 16px rgba(0, 255, 65, 0.1);
 }
