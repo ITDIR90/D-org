@@ -18,7 +18,7 @@ export function InfopanelRain() {
     const fontSize = 18;
     let raf = 0;
     let lastTime = 0;
-    const FRAME_INTERVAL = 50;
+    const FRAME_INTERVAL = 140;
     const DPR = window.devicePixelRatio || 1;
 
     const resize = () => {
