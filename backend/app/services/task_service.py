@@ -331,6 +331,11 @@ async def complete_task(db: AsyncSession, user: User, task: Task) -> Task:
     if task.assignee_id != user.id and user.role != UserRole.SUPERADMIN:
         if not await is_group_admin(db, user, task.target_group_id):
             raise HTTPException(status_code=403, detail="Нет прав выполнить задачу")
+    old_assignee = task.assignee_id
+    if old_assignee != user.id:
+        task.assignee = user
+        task.assignee_id = user.id
+        await log_task_change(db, EntityType.TASK, task.id, "assignee_id", old_assignee, user.id, user.id)
     cat = await db.get(Category, task.category_id)
     old_status = task.status
     if cat and cat.requires_author_confirmation:

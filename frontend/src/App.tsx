@@ -21,6 +21,8 @@ import { SystemSettingsPage } from './pages/SystemSettingsPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { InfoPanelPage } from './pages/InfoPanelPage';
 import { EmployeeEfficiencyPage } from './pages/EmployeeEfficiencyPage';
+import { CompletedTasksReportPage } from './pages/CompletedTasksReportPage';
+import { ReportsIndexPage } from './pages/ReportsIndexPage';
 
 export default function App() {
   return (
@@ -47,7 +49,9 @@ export default function App() {
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/chats/group" element={<GroupChatPage />} />
             <Route path="/chats/direct" element={<DirectChatPage />} />
+            <Route path="/reports" element={<ReportsIndexPage />} />
             <Route path="/reports/efficiency" element={<EmployeeEfficiencyPage />} />
+            <Route path="/reports/completed-tasks" element={<CompletedTasksReportPage />} />
             <Route path="/logs" element={<LogsPage />} />
             <Route path="/settings" element={<SystemSettingsPage />} />
           </Route>

@@ -53,4 +53,5 @@ class Task(Base):
     author: Mapped["User"] = relationship(foreign_keys=[author_id])
     assignee: Mapped["User | None"] = relationship(foreign_keys=[assignee_id])
     category: Mapped["Category"] = relationship()
+    target_group: Mapped["Group"] = relationship(foreign_keys=[target_group_id])
     recurring_template: Mapped["RecurringTaskTemplate | None"] = relationship()

@@ -1,6 +1,6 @@
-from datetime import datetime
+from datetime import date, datetime
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text, func
+from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Integer, JSON, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.enums import ScheduleType, TaskPriority, pg_enum
@@ -20,8 +20,19 @@ class RecurringTaskTemplate(Base):
     priority: Mapped[TaskPriority] = mapped_column(
         pg_enum(TaskPriority, "recurring_priority", create_type=False), default=TaskPriority.MEDIUM
     )
+
+    # Период действия шаблона (опционально). Вне периода задачи не создаются.
+    start_date: Mapped[date | None] = mapped_column(Date)
+    end_date: Mapped[date | None] = mapped_column(Date)
+
+    # Расписание-конструктор (аналог 1С)
     schedule_type: Mapped[ScheduleType] = mapped_column(pg_enum(ScheduleType, "schedule_type"))
     cron_expression: Mapped[str | None] = mapped_column(String(100))
+    interval: Mapped[int] = mapped_column(Integer, default=1)  # раз в N дней/недель/месяцев
+    weekdays: Mapped[list[int] | None] = mapped_column(JSON)  # для weekly: [0-6]
+    month_days: Mapped[list[int] | None] = mapped_column(JSON)  # для monthly: [1-31]
+    run_at: Mapped[str | None] = mapped_column(String(5))  # "HH:MM" время запуска
+
     due_days: Mapped[int] = mapped_column(Integer, default=2)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     last_run_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

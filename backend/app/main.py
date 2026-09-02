@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+import logging
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from fastapi import Depends, FastAPI, HTTPException, Request
@@ -14,6 +15,11 @@ from app.services.ai_service import ModerationError, get_ai_status, probe_correc
 from app.services.notification_delivery import get_channels_status
 
 settings = get_settings()
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+)
 
 
 @asynccontextmanager

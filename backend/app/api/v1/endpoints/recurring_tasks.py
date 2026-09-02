@@ -1,11 +1,9 @@
-from datetime import datetime, timezone
-
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user
-from app.core.enums import UserRole
+from app.core.enums import ScheduleType, UserRole
 from app.core.permissions import can_create_task_in_group, get_accessible_group_ids
 from app.db.session import get_db
 from app.models.recurring_task import RecurringTaskTemplate
@@ -16,6 +14,18 @@ from app.services.ai_service import ModerationError, process_fields
 from app.services.recurring_service import compute_next_run
 
 router = APIRouter(prefix="/recurring-tasks", tags=["recurring-tasks"])
+
+
+def validate_recurring_schedule(
+    schedule_type: ScheduleType,
+    cron_expression: str | None,
+    start_date,
+    end_date,
+) -> None:
+    if schedule_type == ScheduleType.CRON and not cron_expression:
+        raise HTTPException(status_code=400, detail="Для расписания cron укажите выражение cron")
+    if start_date and end_date and start_date > end_date:
+        raise HTTPException(status_code=400, detail="Дата начала не может быть позже даты окончания")
 
 
 @router.get("", response_model=list[RecurringTaskRead])
@@ -37,6 +47,7 @@ async def create_recurring(
 ):
     if not await can_create_task_in_group(db, user, data.target_group_id):
         raise HTTPException(status_code=403, detail="Нет прав")
+    validate_recurring_schedule(data.schedule_type, data.cron_expression, data.start_date, data.end_date)
     fields = {"title": data.title}
     if data.description:
         fields["description"] = data.description
@@ -58,9 +69,23 @@ async def create_recurring(
         priority=data.priority,
         schedule_type=data.schedule_type,
         cron_expression=data.cron_expression,
+        start_date=data.start_date,
+        end_date=data.end_date,
+        interval=data.interval,
+        weekdays=data.weekdays,
+        month_days=data.month_days,
+        run_at=data.run_at,
         due_days=data.due_days,
         next_run_at=compute_next_run(
-            RecurringTaskTemplate(schedule_type=data.schedule_type, cron_expression=data.cron_expression)
+            RecurringTaskTemplate(
+                schedule_type=data.schedule_type,
+                cron_expression=data.cron_expression,
+                start_date=data.start_date,
+                interval=data.interval,
+                weekdays=data.weekdays,
+                month_days=data.month_days,
+                run_at=data.run_at,
+            )
         ),
     )
     db.add(template)
@@ -77,9 +102,15 @@ async def update_recurring(
     template = await db.get(RecurringTaskTemplate, template_id)
     if not template:
         raise HTTPException(status_code=404, detail="Шаблон не найден")
-    for key, value in data.model_dump(exclude_unset=True).items():
+    payload = data.model_dump(exclude_unset=True)
+    new_schedule_type = payload.get("schedule_type", template.schedule_type)
+    new_cron = payload.get("cron_expression", template.cron_expression)
+    new_start = payload.get("start_date", template.start_date)
+    new_end = payload.get("end_date", template.end_date)
+    validate_recurring_schedule(new_schedule_type, new_cron, new_start, new_end)
+    for key, value in payload.items():
         setattr(template, key, value)
-    if data.schedule_type or data.cron_expression:
+    if any(k in payload for k in ("schedule_type", "cron_expression", "start_date", "interval", "weekdays", "month_days", "run_at")):
         template.next_run_at = compute_next_run(template)
     return template
 

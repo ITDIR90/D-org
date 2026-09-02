@@ -565,6 +565,186 @@ a:hover { color: var(--color-steel-light); text-decoration: none; }
   color: var(--color-text);
 }
 
+.report-filters input[type="date"] {
+  min-width: 10rem;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.report-summary {
+  margin-bottom: 1rem;
+  padding: 0.65rem 1rem;
+  border-radius: var(--radius);
+  background: var(--color-surface-2, var(--color-surface));
+  border: 1px solid var(--color-border);
+  font-size: 0.9rem;
+}
+
+tr.report-day-row td {
+  background: var(--color-surface-2, rgba(59, 106, 153, 0.08));
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  padding-top: 0.65rem;
+}
+
+.report-task-title {
+  font-weight: 500;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.table-wrap.wide {
+  overflow-x: auto;
+}
+
+.matrix-table th,
+.matrix-table td {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.matrix-table .matrix-corner,
+.matrix-table .matrix-cat {
+  text-align: left;
+  white-space: normal;
+  min-width: 12rem;
+  max-width: 18rem;
+}
+
+.matrix-day {
+  font-weight: 600;
+}
+
+.matrix-weekday {
+  display: block;
+  font-weight: 400;
+  font-size: 0.72rem;
+  color: var(--color-muted, var(--color-text-secondary));
+}
+
+.matrix-cell-wrap {
+  padding: 0.2rem;
+}
+
+.matrix-cell {
+  min-width: 2.1rem;
+  height: 2.1rem;
+  padding: 0.15rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm, 6px);
+  background: rgba(46, 128, 169, 0.12);
+  color: var(--color-text);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.05s;
+}
+
+.matrix-cell:hover {
+  background: rgba(46, 128, 169, 0.28);
+  transform: scale(1.06);
+}
+
+.matrix-cell:active {
+  transform: scale(0.97);
+}
+
+.matrix-cell-empty {
+  color: var(--color-muted, var(--color-text-secondary));
+}
+
+.matrix-total {
+  font-weight: 600;
+  background: var(--color-surface-2, rgba(59, 106, 153, 0.06));
+}
+
+.matrix-total-row td {
+  border-top: 2px solid var(--color-border);
+  font-weight: 700;
+}
+
+.matrix-total-row .matrix-cat {
+  background: var(--color-surface-2, rgba(59, 106, 153, 0.06));
+}
+
+.cell-tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.cell-task {
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius);
+  padding: 0.6rem 0.8rem;
+}
+
+.cell-task-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.cell-task-head a {
+  font-weight: 700;
+  color: var(--color-steel);
+  text-decoration: none;
+}
+
+.cell-task-head a:hover {
+  text-decoration: underline;
+}
+
+.cell-task-priority {
+  font-size: 0.78rem;
+  color: var(--color-muted, var(--color-text-secondary));
+}
+
+.cell-task-title {
+  margin-top: 0.15rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.cell-task-meta {
+  margin-top: 0.2rem;
+  font-size: 0.78rem;
+  color: var(--color-muted, var(--color-text-secondary));
+}
+
+.report-card {
+  text-decoration: none;
+}
+
+.report-card h2 {
+  color: var(--color-text);
+}
+
+.report-card .card-link {
+  color: var(--color-steel);
+}
+
+.report-card-icon {
+  font-size: 1.2rem;
+  display: inline-flex;
+  align-items: center;
+}
+
+.report-card-desc {
+  font-size: 0.85rem;
+  color: var(--color-muted, var(--color-text-secondary));
+  margin-bottom: 0.25rem;
+}
+
 .view-toggle {
   display: inline-flex;
   padding: 3px;
@@ -1032,7 +1212,10 @@ a:hover { color: var(--color-steel-light); text-decoration: none; }
   white-space: nowrap;
 }
 .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-
+.btn-sm {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.8rem;
+}
 .btn-primary {
   background: var(--color-steel);
   color: #fff;
@@ -1364,6 +1547,43 @@ a:hover { color: var(--color-steel-light); text-decoration: none; }
   margin: -0.25rem 0 0.5rem;
   font-weight: 400;
 }
+
+.form-hint,
+.muted {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+.form-hint {
+  margin: 0.15rem 0 0.5rem;
+}
+
+.muted {
+  margin: 0.15rem 0 0;
+}
+
+.weekday-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.weekday-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm, 6px);
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.weekday-option input {
+  margin: 0;
+}
+
 
 .checkbox-grid {
   display: grid;
