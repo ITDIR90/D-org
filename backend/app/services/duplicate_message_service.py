@@ -4,7 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
-from app.models.chat import DirectChatMessage, GroupChatMessage
+from app.models.chat import GroupChatMessage
 from app.models.comment import Comment
 from app.models.task import Task
 
@@ -90,7 +90,6 @@ async def _recent_user_message_texts(
     sources = (
         (Comment, Comment.author_id),
         (GroupChatMessage, GroupChatMessage.author_id),
-        (DirectChatMessage, DirectChatMessage.sender_id),
     )
     for model, user_field in sources:
         result = await db.execute(

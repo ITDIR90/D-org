@@ -70,7 +70,7 @@ class Settings(BaseSettings):
     INTEGRATION_USER_ID: int = 0
 
     UPLOAD_DIR: str = "uploads"
-    MAX_UPLOAD_SIZE_MB: int = 10
+    MAX_UPLOAD_SIZE_MB: int = 5
 
     @property
     def cors_origins(self) -> List[str]:

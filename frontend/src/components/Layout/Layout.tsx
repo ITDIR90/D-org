@@ -1,7 +1,7 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';
 import { useEffect, useState } from 'react';
-import { listNotifications } from '../../api/chats';
+import { listNotifications } from '../../api/notifications';
 import { LogoMark, LogoText } from '../Logo/Logo';
 import { TopbarKpis } from './TopbarKpis';
 import { isRequestOnly } from '../../constants/roles';
@@ -14,7 +14,6 @@ const NAV = [
   { path: '/projects', label: 'Проекты', icon: '▤' },
   { path: '/recurring', label: 'Регулярные задачи', icon: '↻' },
   { path: '/chats/group', label: 'Чат группы', icon: '💬' },
-  { path: '/chats/direct', label: 'Личные сообщения', icon: '✉' },
   { path: '/users', label: 'Пользователи', icon: '👤', roles: ['superadmin', 'group_admin'] },
   { path: '/groups', label: 'Группы', icon: '⬡', roles: ['superadmin'] },
   { path: '/categories', label: 'Категории', icon: '▦', roles: ['superadmin', 'group_admin'] },

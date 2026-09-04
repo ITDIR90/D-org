@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { listUserActions, clearUserActions } from '../api/chats';
+import { listUserActions, clearUserActions } from '../api/logs';
 import { SortableTh } from '../components/Table/SortableTh';
 import { useTableSort } from '../hooks/useTableSort';
 

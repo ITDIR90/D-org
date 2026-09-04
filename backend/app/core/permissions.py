@@ -109,28 +109,6 @@ async def can_view_group_chat(db: AsyncSession, user: User, group_id: int) -> bo
     return group_id in accessible
 
 
-async def can_message_user(db: AsyncSession, user: User, other_user_id: int) -> bool:
-    if is_request_only(user):
-        return False
-    if user.id == other_user_id:
-        return False
-    other = await db.get(User, other_user_id)
-    if not other or not other.is_active:
-        return False
-    if user.role == UserRole.SUPERADMIN:
-        return True
-    accessible = await get_accessible_group_ids(db, user)
-    if not accessible:
-        return False
-    result = await db.execute(
-        select(UserGroupMembership.group_id).where(
-            UserGroupMembership.user_id == other_user_id,
-            UserGroupMembership.group_id.in_(accessible),
-        )
-    )
-    return result.first() is not None
-
-
 async def can_create_project(db: AsyncSession, user: User, group_id: int) -> bool:
     if is_request_only(user):
         return False

@@ -4,7 +4,7 @@ from typing import Any, Optional
 
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from passlib.exc import PasslibHashError
+from passlib.exc import InvalidHashError, PasslibSecurityError
 
 from app.core.config import get_settings
 
@@ -19,7 +19,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
         return False
     try:
         return pwd_context.verify(plain_password, hashed_password)
-    except (PasslibHashError, ValueError, TypeError):
+    except (InvalidHashError, PasslibSecurityError, ValueError, TypeError):
         return False
     except Exception:
         logger.exception("Unexpected error during password verification")

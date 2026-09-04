@@ -1,6 +1,6 @@
 from app.models.app_setting import AppSetting
 from app.models.category import Category
-from app.models.chat import DirectChatMessage, GroupChatMessage
+from app.models.chat import GroupChatMessage
 from app.models.comment import Comment
 from app.models.group import Group
 from app.models.logs import TaskChangeLog, UserActionLog
@@ -30,7 +30,6 @@ __all__ = [
     "Notification",
     "UserDeviceToken",
     "GroupChatMessage",
-    "DirectChatMessage",
     "TaskChangeLog",
     "UserActionLog",
     "AppSetting",

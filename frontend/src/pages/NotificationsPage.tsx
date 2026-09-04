@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { listNotifications, markRead, markAllRead } from '../api/chats';
+import { listNotifications, markRead, markAllRead } from '../api/notifications';
 
 export function NotificationsPage() {
   const [items, setItems] = useState<{ id: number; title: string; message: string; is_read: boolean; created_at: string }[]>([]);

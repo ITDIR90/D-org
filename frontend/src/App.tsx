@@ -15,7 +15,6 @@ import { GroupsPage } from './pages/GroupsPage';
 import { CategoriesPage } from './pages/CategoriesPage';
 import { NotificationsPage } from './pages/NotificationsPage';
 import { GroupChatPage } from './pages/GroupChatPage';
-import { DirectChatPage } from './pages/DirectChatPage';
 import { LogsPage } from './pages/LogsPage';
 import { AdminPanelPage } from './pages/AdminPanelPage';
 import { SystemSettingsPage } from './pages/SystemSettingsPage';
@@ -49,7 +48,6 @@ export default function App() {
             <Route path="/categories" element={<CategoriesPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/chats/group" element={<GroupChatPage />} />
-            <Route path="/chats/direct" element={<DirectChatPage />} />
             <Route path="/reports" element={<ReportsIndexPage />} />
             <Route path="/reports/efficiency" element={<EmployeeEfficiencyPage />} />
             <Route path="/reports/completed-tasks" element={<CompletedTasksReportPage />} />

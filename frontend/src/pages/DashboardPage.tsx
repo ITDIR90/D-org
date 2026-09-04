@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { listTasks } from '../api/tasks';
-import { listNotifications } from '../api/chats';
+import { listNotifications } from '../api/notifications';
 import type { Task } from '../api/tasks';
 import { TaskCompactList } from '../components/TaskTable/TaskCompactList';
 import { useAuth } from '../auth/AuthContext';

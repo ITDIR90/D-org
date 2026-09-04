@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Modal } from '../components/Modal/Modal';
-import { listRecurring } from '../api/chats';
+import { listRecurring } from '../api/recurring';
 import { listGroups } from '../api/groups';
 import { listCategories } from '../api/categories';
 import { listUsers } from '../api/users';
