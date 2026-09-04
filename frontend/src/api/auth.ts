@@ -2,7 +2,6 @@ import { api, setToken } from './client';
 
 const REMEMBER_KEY = 'remember_login';
 const SAVED_NICKNAME_KEY = 'saved_nickname';
-const SAVED_PASSWORD_KEY = 'saved_password';
 
 export interface User {
   id: number;
@@ -29,7 +28,6 @@ export interface User {
 
 export interface SavedLogin {
   nickname: string;
-  password: string;
   remember: boolean;
 }
 
@@ -38,7 +36,6 @@ export function loadSavedLogin(): SavedLogin {
   return {
     remember,
     nickname: remember ? localStorage.getItem(SAVED_NICKNAME_KEY) || '' : '',
-    password: remember ? localStorage.getItem(SAVED_PASSWORD_KEY) || '' : '',
   };
 }
 
@@ -46,12 +43,10 @@ export function saveLoginCredentials(nickname: string, password: string, remembe
   if (remember) {
     localStorage.setItem(REMEMBER_KEY, 'true');
     localStorage.setItem(SAVED_NICKNAME_KEY, nickname);
-    localStorage.setItem(SAVED_PASSWORD_KEY, password);
     return;
   }
   localStorage.removeItem(REMEMBER_KEY);
   localStorage.removeItem(SAVED_NICKNAME_KEY);
-  localStorage.removeItem(SAVED_PASSWORD_KEY);
 }
 
 export async function login(nickname: string, password: string) {

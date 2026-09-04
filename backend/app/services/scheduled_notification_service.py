@@ -1,5 +1,5 @@
 from datetime import date, datetime, timedelta, timezone
-from zoneinfo import ZoneInfo
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -103,7 +103,7 @@ async def process_overdue_digests() -> None:
                 continue
             try:
                 tz = ZoneInfo(user.timezone or "Europe/Moscow")
-            except Exception:
+            except (KeyError, ZoneInfoNotFoundError):
                 tz = ZoneInfo("Europe/Moscow")
             local_now = datetime.now(tz)
             if is_non_working_day(local_now.date()):

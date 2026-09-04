@@ -5,6 +5,11 @@ import {
   taskAction, updateTask,
 } from '../api/tasks';
 import type { Task, Comment, ChangeLog } from '../api/tasks';
+import {
+  listTaskAttachments, uploadTaskAttachment, deleteTaskAttachment,
+  attachmentFileUrl, formatSize,
+} from '../api/attachments';
+import type { TaskAttachment } from '../api/attachments';
 import { StatusBadge } from '../components/StatusBadge/StatusBadge';
 import { PriorityBadge } from '../components/PriorityBadge/PriorityBadge';
 import { useAuth } from '../auth/AuthContext';
@@ -28,6 +33,9 @@ export function TaskDetailPage() {
   const [comments, setComments] = useState<Comment[]>([]);
   const [history, setHistory] = useState<ChangeLog[]>([]);
   const [commentText, setCommentText] = useState('');
+  const [attachments, setAttachments] = useState<TaskAttachment[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const [fileInputKey, setFileInputKey] = useState(0);
   const [users, setUsers] = useState<{ id: number; full_name: string; member_group_ids?: number[] }[]>([]);
   const [spentHours, setSpentHours] = useState('');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -46,6 +54,7 @@ export function TaskDetailPage() {
     setNotifyBeforeMinutes(String(t.notify_before_minutes ?? 60));
     setComments(await getComments(Number(id)));
     setHistory(await getHistory(Number(id)));
+    setAttachments(await listTaskAttachments(Number(id)).catch(() => []));
   };
 
   useEffect(() => {
@@ -162,8 +171,36 @@ export function TaskDetailPage() {
     }
   };
 
-  const handleNotifyBeforeSave = async () => {
-    const next = Number(notifyBeforeMinutes);
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    setFileInputKey((k) => k + 1);
+    if (!file) return;
+    setUploading(true);
+    setActionError('');
+    try {
+      await uploadTaskAttachment(task.id, file);
+      await load();
+      showMessage('Изображение прикреплено');
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : 'Ошибка загрузки изображения');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDeleteAttachment = async (att: TaskAttachment) => {
+    if (!confirm(`Удалить изображение «${att.original_name}»?`)) return;
+    setActionError('');
+    try {
+      await deleteTaskAttachment(task.id, att.id);
+      await load();
+      showMessage('Изображение удалено');
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : 'Ошибка удаления');
+    }
+  };
+
+  const handleNotifyBeforeSave = async () => {    const next = Number(notifyBeforeMinutes);
     if (Number.isNaN(next) || next < 0) {
       setActionError('Укажите корректное количество минут');
       throw new Error('invalid notify');
@@ -217,6 +254,7 @@ export function TaskDetailPage() {
   const canConfirm = task.status === 'waiting_author_confirmation' && (isAuthor || isSuperadmin);
   const canCancel = isActive && (isAuthor || isAdmin);
   const canEditReminder = isActive && (isAuthor || isAdmin);
+  const canManageAttachments = isAuthor || isAssignee || isAdmin;
 
   return (
     <div>
@@ -311,6 +349,58 @@ export function TaskDetailPage() {
           <div className="detail-item"><label>Выполнена</label><span>{formatDate(task.completed_at)}</span></div>
         </div>
         {task.description && <p style={{ marginTop: '1rem' }}>{task.description}</p>}
+      </div>
+
+      <div className="card">
+        <h2>Изображения</h2>
+        {attachments.length === 0 ? (
+          <p className="empty">Нет прикреплённых изображений</p>
+        ) : (
+          <div className="task-attachments-grid">
+            {attachments.map((att) => (
+              <div key={att.id} className="task-attachment-item">
+                <a href={attachmentFileUrl(att.url)} target="_blank" rel="noreferrer">
+                  <img
+                    src={attachmentFileUrl(att.url)}
+                    alt={att.original_name}
+                    loading="lazy"
+                    className="task-attachment-thumb"
+                  />
+                </a>
+                <div className="task-attachment-meta">
+                  <span className="task-attachment-name" title={att.original_name}>{att.original_name}</span>
+                  <span className="muted">{formatSize(att.size_bytes)}</span>
+                </div>
+                {canManageAttachments && (
+                  <button
+                    type="button"
+                    className="btn btn-danger btn-sm task-attachment-delete"
+                    onClick={() => void handleDeleteAttachment(att)}
+                    title="Удалить"
+                  >
+                    Удалить
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+        {canManageAttachments && (
+          <div style={{ marginTop: '1rem' }}>
+            <label className="btn btn-secondary btn-sm" style={{ cursor: 'pointer' }}>
+              {uploading ? 'Загрузка...' : 'Прикрепить изображение'}
+              <input
+                key={fileInputKey}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                style={{ display: 'none' }}
+                disabled={uploading}
+                onChange={(e) => void handleUpload(e)}
+              />
+            </label>
+            <span className="muted" style={{ marginLeft: '0.75rem' }}>JPG, PNG, WEBP, GIF · до 10 МБ</span>
+          </div>
+        )}
       </div>
 
       {(isAdmin || isAssignee) && isActive && (

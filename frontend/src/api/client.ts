@@ -25,12 +25,13 @@ function normalizeApiBaseUrl(raw: string): string {
 
 const API_URL = normalizeApiBaseUrl(import.meta.env.VITE_API_URL || '');
 
+export { API_URL };
+
 export interface ApiError {
   detail: string;
 }
 
-export function getToken(): string | null {
-  return localStorage.getItem('token');
+export function getToken(): string | null {  return localStorage.getItem('token');
 }
 
 export function setToken(token: string) {

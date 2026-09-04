@@ -1,13 +1,17 @@
+import logging
 from datetime import datetime, timedelta, timezone
 from typing import Any, Optional
 
 from jose import JWTError, jwt
 from passlib.context import CryptContext
+from passlib.exc import PasslibHashError
 
 from app.core.config import get_settings
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 ALGORITHM = "HS256"
+
+logger = logging.getLogger(__name__)
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -15,7 +19,10 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
         return False
     try:
         return pwd_context.verify(plain_password, hashed_password)
+    except (PasslibHashError, ValueError, TypeError):
+        return False
     except Exception:
+        logger.exception("Unexpected error during password verification")
         return False
 
 

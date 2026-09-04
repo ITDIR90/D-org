@@ -66,6 +66,34 @@ async def create_notification(
     return notification
 
 
+async def create_notifications_batch(
+    db: AsyncSession,
+    user_ids: list[int],
+    ntype: NotificationType,
+    title: str,
+    message: str,
+    entity_type: EntityType | None = None,
+    entity_id: int | None = None,
+) -> list[Notification]:
+    """Create multiple notifications in a single bulk insert."""
+    if not user_ids:
+        return []
+    notifications = [
+        Notification(
+            user_id=uid,
+            type=ntype,
+            title=title,
+            message=message,
+            entity_type=entity_type,
+            entity_id=entity_id,
+        )
+        for uid in user_ids
+    ]
+    db.add_all(notifications)
+    await db.flush()
+    return notifications
+
+
 async def notify_group_members_new_task(
     db: AsyncSession,
     task: Task,
@@ -91,24 +119,35 @@ async def notify_group_members_new_task(
     title = "Новая задача в группе"
     message = format_new_task_message(task)
 
-    for member in members:
-        if member.id in exclude:
-            continue
-        try:
-            await create_notification(
-                db,
-                member.id,
-                NotificationType.TASK_CREATED,
-                title,
-                message,
-                EntityType.TASK,
-                task.id,
-                member,
-            )
-        except Exception:
-            logger.exception(
-                "Failed to notify user %s about new task %s in group %s",
-                member.id,
-                task.id,
-                task.target_group_id,
-            )
+    # Filter out excluded users and collect IDs for batch insert
+    target_user_ids = [m.id for m in members if m.id not in exclude]
+    if not target_user_ids:
+        return
+
+    await db.refresh(task)
+    notifications = await create_notifications_batch(
+        db,
+        target_user_ids,
+        NotificationType.TASK_CREATED,
+        title,
+        message,
+        EntityType.TASK,
+        task.id,
+    )
+
+    # Deliver individually (email/push still need per-user)
+    for notification in notifications:
+        recipient = next((m for m in members if m.id == notification.user_id), None)
+        if recipient:
+            push_data = {
+                "notificationId": str(notification.id),
+                "type": NotificationType.TASK_CREATED.value,
+                "entityType": EntityType.TASK.value,
+                "entityId": str(task.id),
+            }
+            try:
+                await deliver_notification(db, recipient, title, message, push_data=push_data)
+            except Exception:
+                logger.exception(
+                    "Failed to deliver notification %s to user %s", notification.id, recipient.id
+                )

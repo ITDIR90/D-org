@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
@@ -494,8 +494,11 @@ export function TasksPage() {
 
       // /tasks/new и /tasks/my делят TasksPage — без ухода с маршрута форма остаётся открытой
       if (mode === 'new') {
+
         navigate('/tasks/my', { replace: true });
+
         return;
+
       }
 
       load();
@@ -560,8 +563,6 @@ export function TasksPage() {
     window.addEventListener('beforeunload', onBeforeUnload);
     return () => window.removeEventListener('beforeunload', onBeforeUnload);
   }, [mode, showCreate, form, selectedTemplateId]);
-
-
 
   const formProps = {
 
@@ -795,5 +796,4 @@ export function TasksPage() {
   );
 
 }
-
 

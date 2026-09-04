@@ -17,6 +17,7 @@ import { NotificationsPage } from './pages/NotificationsPage';
 import { GroupChatPage } from './pages/GroupChatPage';
 import { DirectChatPage } from './pages/DirectChatPage';
 import { LogsPage } from './pages/LogsPage';
+import { AdminPanelPage } from './pages/AdminPanelPage';
 import { SystemSettingsPage } from './pages/SystemSettingsPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { InfoPanelPage } from './pages/InfoPanelPage';
@@ -53,6 +54,7 @@ export default function App() {
             <Route path="/reports/efficiency" element={<EmployeeEfficiencyPage />} />
             <Route path="/reports/completed-tasks" element={<CompletedTasksReportPage />} />
             <Route path="/logs" element={<LogsPage />} />
+            <Route path="/admin" element={<AdminPanelPage />} />
             <Route path="/settings" element={<SystemSettingsPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />

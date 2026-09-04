@@ -90,7 +90,7 @@ async def send_max_message(
                 detail = body["detail"]
             elif body.get("detail") is not None:
                 detail = str(body["detail"])[:500]
-        except Exception:
+        except (ValueError, TypeError):
             pass
         detail = _format_max_http_error(exc.response.status_code, detail)
         logger.warning("MAX send failed: %s", detail)

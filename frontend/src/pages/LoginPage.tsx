@@ -7,8 +7,8 @@ import { Logo } from '../components/Logo/Logo';
 const saved = loadSavedLogin();
 
 export function LoginPage() {
-  const [nickname, setNickname] = useState(saved.nickname || 'superadmin');
-  const [password, setPassword] = useState(saved.password || 'admin12345');
+  const [nickname, setNickname] = useState(saved.nickname || '');
+  const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(saved.remember);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);

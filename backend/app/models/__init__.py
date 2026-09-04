@@ -10,6 +10,7 @@ from app.models.project import Project, ProjectSubtask
 from app.models.recurring_task import RecurringTaskTemplate
 from app.models.request_template import RequestTemplate
 from app.models.task import Task
+from app.models.task_attachment import TaskAttachment
 from app.models.user import User, UserGroupAdmin, UserGroupMembership, UserTaskTargetGroup
 
 __all__ = [
@@ -20,6 +21,7 @@ __all__ = [
     "Group",
     "Category",
     "Task",
+    "TaskAttachment",
     "Project",
     "ProjectSubtask",
     "RecurringTaskTemplate",

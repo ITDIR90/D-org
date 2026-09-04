@@ -20,6 +20,7 @@ const NAV = [
   { path: '/categories', label: 'Категории', icon: '▦', roles: ['superadmin', 'group_admin'] },
   { path: '/reports', label: 'Отчёты', icon: '📊', roles: ['superadmin', 'group_admin'] },
   { path: '/logs', label: 'Журнал действий', icon: '📋', roles: ['superadmin'] },
+  { path: '/admin', label: 'Админ-панель', icon: '🛠', roles: ['superadmin'] },
   { path: '/settings', label: 'Настройки системы', icon: '⚙', roles: ['superadmin'] },
 ];
 
