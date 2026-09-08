@@ -82,6 +82,11 @@
 [data-theme='dark'] .detail-item label {
   color: var(--color-text-secondary);
 }
+[data-theme='dark'] .task-number-chip {
+  background: rgba(107, 159, 212, 0.16);
+  color: var(--color-steel-light);
+  box-shadow: inset 0 0 0 1px rgba(107, 159, 212, 0.3);
+}
 [data-theme='dark'] .role-badge--superadmin {
   background: rgba(107, 159, 212, 0.15);
   color: var(--color-text-secondary);
@@ -245,6 +250,11 @@
 [data-theme='neon'] .form-group label,
 [data-theme='neon'] .detail-item label {
   color: var(--color-text-secondary);
+}
+[data-theme='neon'] .task-number-chip {
+  background: rgba(0, 212, 255, 0.12);
+  color: var(--color-steel-light);
+  box-shadow: inset 0 0 0 1px rgba(0, 212, 255, 0.3);
 }
 [data-theme='neon'] .role-badge--superadmin {
   background: rgba(0, 212, 255, 0.12);
