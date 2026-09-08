@@ -438,6 +438,7 @@ async def list_infopanel_tasks(db: AsyncSession, group_id: int = INFOPANEL_GROUP
             selectinload(Task.author),
             selectinload(Task.assignee),
             selectinload(Task.category),
+            selectinload(Task.target_group),
         )
         .where(
             Task.target_group_id == group_id,
