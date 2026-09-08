@@ -43,6 +43,8 @@ def enrich_task(task: Task) -> TaskRead:
         data.assignee_name = task.assignee.full_name
     if task.category:
         data.category_name = task.category.name
+    if task.target_group:
+        data.target_group_name = task.target_group.name
     return data
 
 
@@ -51,6 +53,7 @@ async def list_tasks_query(db: AsyncSession, user: User, **filters):
         selectinload(Task.author),
         selectinload(Task.assignee),
         selectinload(Task.category),
+        selectinload(Task.target_group),
     )
     if user.role != UserRole.SUPERADMIN:
         if is_request_only(user):
@@ -117,7 +120,7 @@ async def get_user_task_target_group_ids(db, user_id):
 async def get_task_or_404(db: AsyncSession, task_id: int) -> Task:
     result = await db.execute(
         select(Task)
-        .options(selectinload(Task.author), selectinload(Task.assignee), selectinload(Task.category))
+        .options(selectinload(Task.author), selectinload(Task.assignee), selectinload(Task.category), selectinload(Task.target_group))
         .where(Task.id == task_id)
     )
     task = result.scalar_one_or_none()
