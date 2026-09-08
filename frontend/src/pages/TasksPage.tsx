@@ -769,7 +769,7 @@ export function TasksPage() {
 
       ) : (
 
-        <TaskTable tasks={displayedTasks} />
+        <TaskTable tasks={displayedTasks} showGroup={mode === 'group'} />
 
       )}
 

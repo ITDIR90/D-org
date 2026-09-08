@@ -25,6 +25,7 @@ const TASK_SORT_ACCESSORS = {
   category: (t: Task) => t.category_name ?? '',
   due_at: (t: Task) => new Date(t.due_at).getTime(),
   spent_hours: (t: Task) => t.spent_hours ?? -1,
+  target_group: (t: Task) => t.target_group_name ?? '',
 };
 
 function formatDate(d: string) {
@@ -37,7 +38,7 @@ function formatDate(d: string) {
   });
 }
 
-export function TaskTable({ tasks }: { tasks: Task[] }) {
+export function TaskTable({ tasks, showGroup = false }: { tasks: Task[]; showGroup?: boolean }) {
   const accessors = useMemo(() => TASK_SORT_ACCESSORS, []);
   const { sorted, sortKey, direction, toggleSort } = useTableSort(tasks, accessors);
 
@@ -58,7 +59,9 @@ export function TaskTable({ tasks }: { tasks: Task[] }) {
             <SortableTh label="Ответственный" sortKey="assignee" activeKey={sortKey} direction={direction} onSort={toggleSort} />
             <SortableTh label="Категория" sortKey="category" activeKey={sortKey} direction={direction} onSort={toggleSort} />
             <SortableTh label="Срок" sortKey="due_at" activeKey={sortKey} direction={direction} onSort={toggleSort} />
-            <SortableTh label="Затрачено" sortKey="spent_hours" activeKey={sortKey} direction={direction} onSort={toggleSort} />
+            {showGroup
+              ? <SortableTh label="Группа" sortKey="target_group" activeKey={sortKey} direction={direction} onSort={toggleSort} />
+              : <SortableTh label="Затрачено" sortKey="spent_hours" activeKey={sortKey} direction={direction} onSort={toggleSort} />}
           </tr>
         </thead>
         <tbody>
@@ -75,7 +78,9 @@ export function TaskTable({ tasks }: { tasks: Task[] }) {
               <td>{t.assignee_name || '—'}</td>
               <td>{t.category_name || '—'}</td>
               <td>{formatDate(t.due_at)}</td>
-              <td>{t.spent_hours != null ? `${t.spent_hours} ч` : '—'}</td>
+              {showGroup
+                ? <td>{t.target_group_name || '—'}</td>
+                : <td>{t.spent_hours != null ? `${t.spent_hours} ч` : '—'}</td>}
             </tr>
           ))}
         </tbody>
