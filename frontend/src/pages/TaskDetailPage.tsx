@@ -337,11 +337,9 @@ export function TaskDetailPage() {
 
       <div className="card">
         <div className="detail-grid">
-          <div className="detail-item"><label>Номер</label><span>№{task.number}</span></div>
-          <div className="detail-item"><label>Статус</label><span><StatusBadge status={task.status} /></span></div>
-          <div className="detail-item"><label>Важность</label><span><PriorityBadge priority={task.priority} /></span></div>
+          <div className="detail-item"><label>Номер / Оформлена</label><span>№{task.number} · {formatDate(task.created_at)}</span></div>
+          <div className="detail-item"><label>Важность / Статус</label><span><PriorityBadge priority={task.priority} /> <StatusBadge status={task.status} /></span></div>
           <div className="detail-item"><label>Автор</label><span>{task.author_name}</span></div>
-          <div className="detail-item"><label>Оформлена</label><span>{formatDate(task.created_at)}</span></div>
           <div className="detail-item"><label>Ответственный</label><span>{task.assignee_name || '—'}</span></div>
           <div className="detail-item"><label>Категория</label><span>{task.category_name}</span></div>
           <div className="detail-item"><label>Срок</label><span className={task.is_overdue ? 'overdue-tag' : ''}>{formatDate(task.due_at)}</span></div>
