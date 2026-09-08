@@ -1469,6 +1469,16 @@ tr.report-day-row td {
   margin-right: 0.4rem;
 }
 
+.task-number-chip {
+  display: inline-block;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: var(--color-steel);
+  background: var(--color-surface-2, #eef2f7);
+  border-radius: 6px;
+  padding: 0.1rem 0.5rem;
+}
+
 .task-compact-number {
   font-variant-numeric: tabular-nums;
   color: var(--color-text-muted, #64748b);

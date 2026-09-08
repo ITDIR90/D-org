@@ -337,7 +337,7 @@ export function TaskDetailPage() {
 
       <div className="card">
         <div className="detail-grid">
-          <div className="detail-item"><label>Номер / Оформлена</label><span>№{task.number} · {formatDate(task.created_at)}</span></div>
+          <div className="detail-item"><label>Номер / Оформлена</label><span><span className="task-number-chip">№{task.number}</span> <span style={{ color: 'var(--color-muted)' }}>{formatDate(task.created_at)}</span></span></div>
           <div className="detail-item"><label>Важность / Статус</label><span><PriorityBadge priority={task.priority} /> <StatusBadge status={task.status} /></span></div>
           <div className="detail-item"><label>Автор</label><span>{task.author_name}</span></div>
           <div className="detail-item"><label>Ответственный</label><span>{task.assignee_name || '—'}</span></div>
